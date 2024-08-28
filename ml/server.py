@@ -3,8 +3,8 @@ import pickle
 
 app = Flask(__name__)
 
-nutrients_7_path = '/Users/aviralchauhan/btp/server/final_models/7_Nutrients/nutrients_7.pkl'
-nutrients_8_path = '/Users/aviralchauhan/btp/server/final_models/8_Nutrients/nutrients_8.pkl'
+nutrients_7_path = '/Users/aviralchauhan/btp/server/ml/7_Nutrients/nutrients_7.pkl'
+nutrients_8_path = '/Users/aviralchauhan/btp/server/ml/8_Nutrients/nutrients_8.pkl'
 nutrients_44_path = ''
 
 # Load the model when the server starts

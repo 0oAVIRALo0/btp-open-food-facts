@@ -20,3 +20,26 @@ predictions = model.predict(sample_input)
 
 # Print the predictions
 print(f"Classification: {float(predictions)}")
+
+
+# from sklearn.preprocessing import StandardScaler
+# import numpy as np
+
+# # Example dataset
+# data = np.array([[1.0, 2.0, 3.0],
+#                  [4.0, 5.0, 6.0],
+#                  [7.0, 8.0, 9.0]])
+
+# # Initialize the scaler
+# scaler = StandardScaler()
+
+# # Fit the scaler to your data (calculates mean and standard deviation for scaling)
+# scaler.fit(data)
+
+# # Transform the data using the fitted scaler (standardizes the data)
+# scaled_data = scaler.transform(data)
+
+# print("Original Data:")
+# print(data)
+# print("\nScaled Data:")
+# print(scaled_data)
