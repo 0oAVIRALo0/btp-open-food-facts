@@ -27,10 +27,10 @@ function Predict() {
 
   useEffect(() => {
 
-    if (nutrientLevel == "12Nutrients") {
+    if (nutrientLevel == "7Nutrients") {
       setDummyData(test12Data);
     } 
-    else if (nutrientLevel == "65Nutrients") {
+    else if (nutrientLevel == "8Nutrients") {
       setDummyData(test65Data);
     } 
     else setDummyData(test102Data);
@@ -50,14 +50,16 @@ function Predict() {
     setOpen(true);
     setLoading(true);
     let url = "https://cosylab.iiitd.edu.in/food-processing-api/predict";
-    if (nutrientLevel == "12Nutrients") {
+    if (nutrientLevel == "7Nutrients") {
       url = "https://cosylab.iiitd.edu.in/food-processing-api/predict";
-    } else if (nutrientLevel == "65Nutrients") {
+    } else if (nutrientLevel == "8Nutrients") {
       url =
         "https://cosylab.iiitd.edu.in/food-processing-api/predictwithextranutrients";
     } else
       url =
         "https://cosylab.iiitd.edu.in/food-processing-api/predictwithmicronutrients";
+      
+    console.log("WTF", [val]);
     axios
       .post(url, [val])
       .then((res) => {
