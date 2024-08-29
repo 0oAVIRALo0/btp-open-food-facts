@@ -1,0 +1,41 @@
+ footer {
+  padding: 20px 0;
+  background-color: #776E9A;
+  color: #ffff;
+  font-size: 14px;
+  text-align: center;
+  .__institute_details {
+    display: flex;
+    flex-wrap: wrap;
+    display: inline;
+  }
+  .__social_media {
+    margin-top: 22px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    color: ffff;
+    font-size: 30px;
+    gap: 24px;
+    a{
+      color: #ffff;
+      :hover{
+        color: #ffff;
+        padding-bottom: 6px;
+        border-bottom: 1px solid #ffff;
+      }
+    }
+  }
+
+}
+
+a{
+  text-decoration: none;
+  color: #ffff;
+}
+
+a:hover {
+  cursor: pointer;
+  text-decoration: none;
+  color: #cbbeff;
+}
