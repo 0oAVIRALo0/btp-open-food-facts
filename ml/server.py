@@ -19,16 +19,16 @@ def modelSelection(path):
 
 @app.route('/predict', methods=['POST'])
 def predict():
-    modelId = request.json['model']
-    if (modelId == '7'):
+    nutrientLevel = request.json['nutrientLevel']
+    if (nutrientLevel == '7'):
         modelSelection(nutrients_7_path)
-    elif (modelId == '8'):
+    elif (nutrientLevel == '8'):
         modelSelection(nutrients_8_path)
     else:
         modelSelection(nutrients_44_path)
 
-    data = request.json['input']
-    prediction = model.predict([data])
+    modelInputData = request.json['modelInputData']
+    prediction = model.predict([modelInputData])
     return jsonify({'Classification': float(prediction[0])})
 
 if __name__ == '__main__':

@@ -1,10 +1,28 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 
-import {PredictModal} from "../Components";
-import {nutrientData, meanMedian, test12Data, test65Data, test102Data, test12Data as testData} from '../data'
+import { PredictModal } from "../Components";
+import {
+  nutrientData,
+  meanMedian,
+  test12Data,
+  test65Data,
+  test102Data,
+  test12Data as testData,
+} from "../data";
 
-import {InputLabel, Container,Button, CircularProgress, Slider, InputAdornment, Select, MenuItem, FormControl, TextField} from "@mui/material";
+import {
+  InputLabel,
+  Container,
+  Button,
+  CircularProgress,
+  Slider,
+  InputAdornment,
+  Select,
+  MenuItem,
+  FormControl,
+  TextField,
+} from "@mui/material";
 
 function getRandomInteger(maxIndex) {
   return Math.floor(Math.random() * (maxIndex + 1));
@@ -26,15 +44,11 @@ function Predict() {
   const [nutrientLevel, setNutrientLevel] = useState("");
 
   useEffect(() => {
-
     if (nutrientLevel == "12Nutrients") {
       setDummyData(test12Data);
-    } 
-    else if (nutrientLevel == "65Nutrients") {
+    } else if (nutrientLevel == "65Nutrients") {
       setDummyData(test65Data);
-    } 
-    else setDummyData(test102Data);
-
+    } else setDummyData(test102Data);
   }, [nutrientLevel]);
 
   useEffect(() => {
@@ -49,15 +63,12 @@ function Predict() {
   const onPredict = (val) => {
     setOpen(true);
     setLoading(true);
-    let url = "https://cosylab.iiitd.edu.in/food-processing-api/predict";
+    let url = "http://localhost:8000/api/v1/predict/predict-class";
     if (nutrientLevel == "12Nutrients") {
-      url = "https://cosylab.iiitd.edu.in/food-processing-api/predict";
+      url = "http://localhost:8000/api/v1/predict/predict-class";
     } else if (nutrientLevel == "65Nutrients") {
-      url =
-        "https://cosylab.iiitd.edu.in/food-processing-api/predictwithextranutrients";
-    } else
-      url =
-        "https://cosylab.iiitd.edu.in/food-processing-api/predictwithmicronutrients";
+      url = "http://localhost:8000/api/v1/predict/predict-class";
+    } else url = "http://localhost:8000/api/v1/predict/predict-class";
     axios
       .post(url, [val])
       .then((res) => {
@@ -81,18 +92,23 @@ function Predict() {
 
   useEffect(() => {
     if (nutrientData?.[nutrientLevel]?.[0])
-      console.log("WTF",Object.keys(nutrientData?.[nutrientLevel]?.[0])?.[0]);
+      console.log("WTF", Object.keys(nutrientData?.[nutrientLevel]?.[0])?.[0]);
   }, [nutrientLevel]);
 
   return (
     <Container maxWidth="lg">
       <div className="predict__wrapper">
         {!clicked ? (
-          <div className='nutrient-select-container'>
-            <div className='left'>
-              <div className='predict-nutrient-drop-down'>
-                <FormControl sx={{ minWidth: 200, marginBottom: '20px'}} size="small">
-                  <InputLabel id="demo-select-small-label">Select Nutrient Level</InputLabel>
+          <div className="nutrient-select-container">
+            <div className="left">
+              <div className="predict-nutrient-drop-down">
+                <FormControl
+                  sx={{ minWidth: 200, marginBottom: "20px" }}
+                  size="small"
+                >
+                  <InputLabel id="demo-select-small-label">
+                    Select Nutrient Level
+                  </InputLabel>
                   <Select
                     labelId="demo-select-small-label"
                     id="demo-select-small"
@@ -107,7 +123,7 @@ function Predict() {
                 </FormControl>
               </div>
               <Button
-                className='button'
+                className="button"
                 onClick={() => setClicked(true)}
                 disabled={!nutrientLevel}
                 variant="contained"
@@ -115,35 +131,58 @@ function Predict() {
                 Next
               </Button>
             </div>
-            <div className='right'>
-              <img className='logo' src='/svg/select_nutrient.svg' alt='Select Nutrient'/>
+            <div className="right">
+              <img
+                className="logo"
+                src="/svg/select_nutrient.svg"
+                alt="Select Nutrient"
+              />
             </div>
           </div>
         ) : (
           <>
             {Object.keys(nutrientData?.[nutrientLevel]).map((ty, ind) => {
               return (
-                <span key={ind}>  
+                <span key={ind}>
                   <h2 style={{ textAlign: "left" }}>
-                    {formatTitle(Object.keys(nutrientData?.[nutrientLevel]?.[ty])?.[0])}
+                    {formatTitle(
+                      Object.keys(nutrientData?.[nutrientLevel]?.[ty])?.[0]
+                    )}
                   </h2>
                   <div className="form__wrapper">
-                    {Object.values(nutrientData?.[nutrientLevel]?.[ty])?.[0]?.map(
-                      (column, index) => {
-                        const uniqueId = `${column}-${index}`;
-                        return (
-                          <div className="form__content" key={index}>  
-                            <InputLabel htmlFor={uniqueId}>{column}</InputLabel>
-                            <div style={{display: "flex", alignItems: "center", gap: "20px" }}>
-                              <span style={{ width: "70%" }}>
+                    {Object.values(
+                      nutrientData?.[nutrientLevel]?.[ty]
+                    )?.[0]?.map((column, index) => {
+                      const uniqueId = `${column}-${index}`;
+                      return (
+                        <div className="form__content" key={index}>
+                          <InputLabel htmlFor={uniqueId}>{column}</InputLabel>
+                          <div
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: "20px",
+                            }}
+                          >
+                            <span style={{ width: "70%" }}>
                               <Slider
                                 id={uniqueId}
                                 color={
-                                  ind === 0 ? "primary" : ind === 1 ? "warning" : "secondary"
+                                  ind === 0
+                                    ? "primary"
+                                    : ind === 1
+                                    ? "warning"
+                                    : "secondary"
                                 }
-                                min={meanMedian?.[nutrientLevel]?.[column]?.min || 0}
-                                max={meanMedian?.[nutrientLevel]?.[column]?.max || 100}
-                                value={Number(nutritionInfo?.[column]) || 0}  
+                                min={
+                                  meanMedian?.[nutrientLevel]?.[column]?.min ||
+                                  0
+                                }
+                                max={
+                                  meanMedian?.[nutrientLevel]?.[column]?.max ||
+                                  100
+                                }
+                                value={Number(nutritionInfo?.[column]) || 0}
                                 onChange={(e) => {
                                   setNutritionInfo((nutritionInfo) => ({
                                     ...nutritionInfo,
@@ -153,35 +192,33 @@ function Predict() {
                                 aria-label="Default"
                                 valueLabelDisplay="auto"
                               />
-
-                              </span>
-                              <span style={{ width: "30%" }}>
-                                <TextField
-                                  id="filled-basic"
-                                  value={nutritionInfo?.[column]}
-                                  type="number"
-                                  onChange={(e) => {
-                                    setNutritionInfo((nutritionInfo) => ({
-                                      ...nutritionInfo,
-                                      [column]: e.target.value
-                                    }));
-                                  }}
-                                  InputProps={{
-                                    endAdornment: (
-                                      <InputAdornment position="end">
-                                        {meanMedian?.[nutrientLevel]?.[column]?.unit ||
-                                          ""}
-                                      </InputAdornment>
-                                    )
-                                  }}
-                                  variant="outlined"
-                                />
-                              </span>
-                            </div>
+                            </span>
+                            <span style={{ width: "30%" }}>
+                              <TextField
+                                id="filled-basic"
+                                value={nutritionInfo?.[column]}
+                                type="number"
+                                onChange={(e) => {
+                                  setNutritionInfo((nutritionInfo) => ({
+                                    ...nutritionInfo,
+                                    [column]: e.target.value,
+                                  }));
+                                }}
+                                InputProps={{
+                                  endAdornment: (
+                                    <InputAdornment position="end">
+                                      {meanMedian?.[nutrientLevel]?.[column]
+                                        ?.unit || ""}
+                                    </InputAdornment>
+                                  ),
+                                }}
+                                variant="outlined"
+                              />
+                            </span>
                           </div>
-                        );
-                      }
-                    )}
+                        </div>
+                      );
+                    })}
                   </div>
                 </span>
               );

@@ -3,12 +3,12 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 
 const predict = asyncHandler(async (req, res) => {
   try {
-    const { model, input } = req.body;
-    console.log(`Model: ${model}`);
-    console.log(`Input: ${input}`);
+    const { nutrientLevel, modelInputData } = req.body;
+    console.log(`Number of nutrients: ${nutrientLevel}`);
+    console.log(`Model input: ${modelInputData}`);
     const response = await axios.post("http://127.0.0.1:5001/predict", {
-      model: model,
-      input: input,
+      nutrientLevel: nutrientLevel,
+      modelInputData: modelInputData,
     });
     res.json({
       message: "Successfully classified data!",
