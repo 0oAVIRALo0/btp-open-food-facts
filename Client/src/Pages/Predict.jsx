@@ -1,10 +1,28 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 
-import {PredictModal} from "../Components";
-import {nutrientData, meanMedian, test12Data, test65Data, test102Data, test12Data as testData} from '../data'
+import { PredictModal } from "../Components";
+import {
+  nutrientData,
+  meanMedian,
+  test12Data,
+  test65Data,
+  test102Data,
+  test12Data as testData,
+} from "../data";
 
-import {InputLabel, Container,Button, CircularProgress, Slider, InputAdornment, Select, MenuItem, FormControl, TextField} from "@mui/material";
+import {
+  InputLabel,
+  Container,
+  Button,
+  CircularProgress,
+  Slider,
+  InputAdornment,
+  Select,
+  MenuItem,
+  FormControl,
+  TextField,
+} from "@mui/material";
 
 function getRandomInteger(maxIndex) {
   return Math.floor(Math.random() * (maxIndex + 1));
@@ -26,15 +44,11 @@ function Predict() {
   const [nutrientLevel, setNutrientLevel] = useState("");
 
   useEffect(() => {
-
     if (nutrientLevel == "7Nutrients") {
       setDummyData(test12Data);
-    } 
-    else if (nutrientLevel == "8Nutrients") {
+    } else if (nutrientLevel == "8Nutrients") {
       setDummyData(test65Data);
-    } 
-    else setDummyData(test102Data);
-
+    } else setDummyData(test102Data);
   }, [nutrientLevel]);
 
   useEffect(() => {
@@ -50,31 +64,29 @@ function Predict() {
     setOpen(true);
     setLoading(true);
     let nutrient = "";
-    let url = "http://localhost:8000/api/v1/predict/predict-class"
-    if (nutrientLevel == "7Nutrients")
-      nutrient = "7";
-    else if (nutrientLevel == "8Nutrients")
-      nutrient = "8";
-    else
-      nutrient = "45";
-    
+    let url = "http://localhost:8000/api/v1/predict/predict-class";
+    if (nutrientLevel == "7Nutrients") nutrient = "7";
+    else if (nutrientLevel == "8Nutrients") nutrient = "8";
+    else nutrient = "45";
+
     const data = {
-      nutrientLevel: nutrient, 
-      modelInputData: Object.values(val).map(Number)  
+      nutrientLevel: nutrient,
+      modelInputData: Object.values(val).map(Number),
     };
-    
+
     axios
-      .post(url, {data})
+      .post(url, { data })
       .then((res) => {
         setLoading(false);
+        console.log(res);
         let temp = "";
-        if (res?.data?.predicted_data?.[0] == 1)
+        if (res?.data?.data?.Classification == 1)
           temp = "Unprocessed (NOVA Class 1)";
-        else if (res?.data?.predicted_data?.[0] == 2)
+        else if (res?.data?.data?.Classification == 2)
           temp = "Processed Culinary Ingredients (NOVA Class 2)";
-        else if (res?.data?.predicted_data?.[0] == 3)
+        else if (res?.data?.data?.Classification == 3)
           temp = "Processed (NOVA Class 3)";
-        else if (res?.data?.predicted_data?.[0] == 4)
+        else if (res?.data?.data?.Classification == 4)
           temp = "Ultra-Processed (NOVA Class 4)";
         setResult(temp);
       })
@@ -93,11 +105,16 @@ function Predict() {
     <Container maxWidth="lg">
       <div className="predict__wrapper">
         {!clicked ? (
-          <div className='nutrient-select-container'>
-            <div className='left'>
-              <div className='predict-nutrient-drop-down'>
-                <FormControl sx={{ minWidth: 200, marginBottom: '20px'}} size="small">
-                  <InputLabel id="demo-select-small-label">Select Nutrient Level</InputLabel>
+          <div className="nutrient-select-container">
+            <div className="left">
+              <div className="predict-nutrient-drop-down">
+                <FormControl
+                  sx={{ minWidth: 200, marginBottom: "20px" }}
+                  size="small"
+                >
+                  <InputLabel id="demo-select-small-label">
+                    Select Nutrient Level
+                  </InputLabel>
                   <Select
                     labelId="demo-select-small-label"
                     id="demo-select-small"
@@ -112,7 +129,7 @@ function Predict() {
                 </FormControl>
               </div>
               <Button
-                className='button'
+                className="button"
                 onClick={() => setClicked(true)}
                 disabled={!nutrientLevel}
                 variant="contained"
@@ -120,35 +137,58 @@ function Predict() {
                 Next
               </Button>
             </div>
-            <div className='right'>
-              <img className='logo' src='/svg/select_nutrient.svg' alt='Select Nutrient'/>
+            <div className="right">
+              <img
+                className="logo"
+                src="/svg/select_nutrient.svg"
+                alt="Select Nutrient"
+              />
             </div>
           </div>
         ) : (
           <>
             {Object.keys(nutrientData?.[nutrientLevel]).map((ty, ind) => {
               return (
-                <span key={ind}>  
+                <span key={ind}>
                   <h2 style={{ textAlign: "left" }}>
-                    {formatTitle(Object.keys(nutrientData?.[nutrientLevel]?.[ty])?.[0])}
+                    {formatTitle(
+                      Object.keys(nutrientData?.[nutrientLevel]?.[ty])?.[0]
+                    )}
                   </h2>
                   <div className="form__wrapper">
-                    {Object.values(nutrientData?.[nutrientLevel]?.[ty])?.[0]?.map(
-                      (column, index) => {
-                        const uniqueId = `${column}-${index}`;
-                        return (
-                          <div className="form__content" key={index}>  
-                            <InputLabel htmlFor={uniqueId}>{column}</InputLabel>
-                            <div style={{display: "flex", alignItems: "center", gap: "20px" }}>
-                              <span style={{ width: "70%" }}>
+                    {Object.values(
+                      nutrientData?.[nutrientLevel]?.[ty]
+                    )?.[0]?.map((column, index) => {
+                      const uniqueId = `${column}-${index}`;
+                      return (
+                        <div className="form__content" key={index}>
+                          <InputLabel htmlFor={uniqueId}>{column}</InputLabel>
+                          <div
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: "20px",
+                            }}
+                          >
+                            <span style={{ width: "70%" }}>
                               <Slider
                                 id={uniqueId}
                                 color={
-                                  ind === 0 ? "primary" : ind === 1 ? "warning" : "secondary"
+                                  ind === 0
+                                    ? "primary"
+                                    : ind === 1
+                                    ? "warning"
+                                    : "secondary"
                                 }
-                                min={meanMedian?.[nutrientLevel]?.[column]?.min || 0}
-                                max={meanMedian?.[nutrientLevel]?.[column]?.max || 100}
-                                value={Number(nutritionInfo?.[column]) || 0}  
+                                min={
+                                  meanMedian?.[nutrientLevel]?.[column]?.min ||
+                                  0
+                                }
+                                max={
+                                  meanMedian?.[nutrientLevel]?.[column]?.max ||
+                                  100
+                                }
+                                value={Number(nutritionInfo?.[column]) || 0}
                                 onChange={(e) => {
                                   setNutritionInfo((nutritionInfo) => ({
                                     ...nutritionInfo,
@@ -158,35 +198,33 @@ function Predict() {
                                 aria-label="Default"
                                 valueLabelDisplay="auto"
                               />
-
-                              </span>
-                              <span style={{ width: "30%" }}>
-                                <TextField
-                                  id="filled-basic"
-                                  value={nutritionInfo?.[column]}
-                                  type="number"
-                                  onChange={(e) => {
-                                    setNutritionInfo((nutritionInfo) => ({
-                                      ...nutritionInfo,
-                                      [column]: e.target.value
-                                    }));
-                                  }}
-                                  InputProps={{
-                                    endAdornment: (
-                                      <InputAdornment position="end">
-                                        {meanMedian?.[nutrientLevel]?.[column]?.unit ||
-                                          ""}
-                                      </InputAdornment>
-                                    )
-                                  }}
-                                  variant="outlined"
-                                />
-                              </span>
-                            </div>
+                            </span>
+                            <span style={{ width: "30%" }}>
+                              <TextField
+                                id="filled-basic"
+                                value={nutritionInfo?.[column]}
+                                type="number"
+                                onChange={(e) => {
+                                  setNutritionInfo((nutritionInfo) => ({
+                                    ...nutritionInfo,
+                                    [column]: e.target.value,
+                                  }));
+                                }}
+                                InputProps={{
+                                  endAdornment: (
+                                    <InputAdornment position="end">
+                                      {meanMedian?.[nutrientLevel]?.[column]
+                                        ?.unit || ""}
+                                    </InputAdornment>
+                                  ),
+                                }}
+                                variant="outlined"
+                              />
+                            </span>
                           </div>
-                        );
-                      }
-                    )}
+                        </div>
+                      );
+                    })}
                   </div>
                 </span>
               );

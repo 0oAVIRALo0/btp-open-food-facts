@@ -3,6 +3,6 @@ import { predict } from "../controllers/predict.controller.js";
 
 const router = Router();
 
-router.route("/predict-class").get(predict);
+router.route("/predict-class").post(predict);
 
 export default router;
