@@ -1,28 +1,11 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 
-import { PredictModal } from "../Components";
-import {
-  nutrientData,
-  meanMedian,
-  test12Data,
-  test65Data,
-  test102Data,
-  test12Data as testData,
-} from "../data";
+import {nutrientData, meanMedian, test12Data, test65Data, test102Data, test12Data as testData} from "../data";
 
-import {
-  InputLabel,
-  Container,
-  Button,
-  CircularProgress,
-  Slider,
-  InputAdornment,
-  Select,
-  MenuItem,
-  FormControl,
-  TextField,
-} from "@mui/material";
+import {InputLabel, Container, Button, CircularProgress, Slider, InputAdornment, TextField} from "@mui/material";
+import { Button as AntdButton, Modal, Select} from 'antd';
+import {CaretDownOutlined} from '@ant-design/icons';
 
 function getRandomInteger(maxIndex) {
   return Math.floor(Math.random() * (maxIndex + 1));
@@ -35,13 +18,14 @@ function formatTitle(string) {
 }
 
 function Predict() {
-  const [open, setOpen] = useState(false);
+  const [nutrientLevel, setNutrientLevel] = useState("");
   const [clicked, setClicked] = useState(false);
   const [dummyData, setDummyData] = useState(testData);
   const [nutritionInfo, setNutritionInfo] = useState({});
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState("");
-  const [nutrientLevel, setNutrientLevel] = useState("");
+  const [predictModal, setPredictModal] = useState(false);
+
 
   useEffect(() => {
     if (nutrientLevel == "7Nutrients") {
@@ -61,7 +45,7 @@ function Predict() {
   };
 
   const onPredict = (val) => {
-    setOpen(true);
+    setPredictModal(true);
     setLoading(true);
     let nutrient = "";
     let url = "http://localhost:8000/api/v1/predict/predict-class";
@@ -108,25 +92,15 @@ function Predict() {
           <div className="nutrient-select-container">
             <div className="left">
               <div className="predict-nutrient-drop-down">
-                <FormControl
-                  sx={{ minWidth: 200, marginBottom: "20px" }}
-                  size="small"
-                >
-                  <InputLabel id="demo-select-small-label">
-                    Select Nutrient Level
-                  </InputLabel>
-                  <Select
-                    labelId="demo-select-small-label"
-                    id="demo-select-small"
-                    value={nutrientLevel}
-                    label="Select Nutrient Level"
-                    onChange={handleChangeSelect}
-                  >
-                    <MenuItem value={"7Nutrients"}>7 Nutrients</MenuItem>
-                    <MenuItem value={"8Nutrients"}>8 Nutrients</MenuItem>
-                    <MenuItem value={"45Nutrients"}>45 Nutrients</MenuItem>
-                  </Select>
-                </FormControl>
+                
+                <label>Select Nutrient Levle</label>
+                <Select placeholder="Select Nutrient Level" className="edit-select-input"  onChange={e=>setNutrientLevel(e)} suffixIcon={<CaretDownOutlined style={{color:'#000000'}}/>}
+                  options={[
+                    {label:'7 Nutrients', value:"7Nutrients"},
+                    {label:'8 Nutrients', value:"8Nutrients"},
+                    {label:'45 Nutrients', value:"45Nutrients"},
+                  ]}
+                  getPopupContainer={trigger => trigger.parentElement}/> 
               </div>
               <Button
                 className="button"
@@ -262,28 +236,38 @@ function Predict() {
           </>
         )}
 
-        <PredictModal
-          open={open}
-          setOpen={setOpen}
-          result={result}
-          loading={loading}
-        />
-
-        {loading ? (
-          <span>
-            <br /> <br />
-            <CircularProgress size={40} />
-          </span>
-        ) : result == "Error" ? (
-          <div style={{ color: "red", fontSize: "24px", padding: "20px 0" }}>
-            Something Went Wrong
-          </div>
-        ) : result ? (
-          <div style={{ fontSize: "24px", padding: "20px 0" }}>
-            The food is <span style={{ color: "green" }}>{result}</span>
-          </div>
-        ) : (
-          ""
+        {predictModal && (
+          <Modal
+            width='60%'
+              open={predictModal}
+              className="prediction-modal"
+              onCancel={() => setPredictModal(false)}
+              onOk={() => setPredictModal(false)}
+              title="Prediction Result"
+            > 
+        
+            <div className="wrapper">
+              {loading ? (
+                <span>
+                  <br /> <br />
+                  <CircularProgress size={40} />
+                </span>
+              ) : result == "Error" ? (
+                <div style={{ color: "red", fontSize: "24px", padding: "20px 0" }}>
+                  Something Went Wrong
+                </div>
+              ) : result ? (
+                <div style={{ fontSize: "24px", padding: "20px 0" }}>
+                  The food is <span style={{ color: "green" }}>{result}</span>
+                </div>
+              ) : (
+                ""
+              )}
+            </div>
+            <div style={{display:'flex', justifyContent:'flex-end'}}>
+              <AntdButton onClick={() => setPredictModal(false)} className="close-button">Ok</AntdButton>
+            </div>
+          </Modal>
         )}
       </div>
     </Container>
