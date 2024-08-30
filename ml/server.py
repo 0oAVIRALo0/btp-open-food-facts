@@ -1,11 +1,13 @@
 from flask import Flask, request, jsonify
 import pickle
+import os
 
 app = Flask(__name__)
 
-nutrients_7_path = '/Users/mahansh/Downloads/Practice/Aviral OpenFoodFacts/ml/7_Nutrients/nutrients_7.pkl'
-nutrients_8_path = '/Users/mahansh/Downloads/Practice/Aviral OpenFoodFacts/ml/8_Nutrients/nutrients_8.pkl'
-nutrients_44_path = ''
+base_dir = os.path.dirname(__file__)
+nutrients_7_path = os.path.join(base_dir, '7_Nutrients/nutrients_7.pkl')
+nutrients_8_path = os.path.join(base_dir, '8_Nutrients/nutrients_8.pkl')
+nutrients_44_path = os.path.join(base_dir, '44_Nutrients/nutrients_44.pkl')
 
 # Load the model when the server starts
 with open(nutrients_7_path, 'rb') as f:
