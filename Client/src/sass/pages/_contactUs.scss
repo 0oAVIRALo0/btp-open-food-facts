@@ -1,0 +1,98 @@
+.contact_container {
+    text-align: left;
+  }
+  
+  .grey_card {
+    min-height: calc(100vh - 430px);
+    line-height: 26px;
+    padding: 40px;
+    // background-color: #f6f4ff;
+    position: relative;
+    margin: 1rem 0;
+  }
+  
+  div {
+    display: block;
+  }
+  
+  .row {
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 20px;
+    overflow: hidden;
+    a {
+        text-decoration: none;
+        color: #776E9A;
+        font-weight: 600;
+      }
+  }
+  
+  .row .col {
+    float: left;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    padding: 0 0.75rem;
+    min-height: 1px;
+  }
+  
+  strong {
+    font-weight: 500;
+  }
+  
+  iframe {
+    min-height: 500px;
+    max-width: 100%;
+  }
+  
+  .row::after {
+    content: "";
+    clear: both;
+    display: table;
+  }
+  
+  .col {
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    padding: 0.75rem;
+    min-height: 1px;
+  }
+  
+  .col.m5 {
+    width: 100%;
+    margin-left: auto;
+    left: auto;
+    right: auto; 
+  }
+  
+  .col.m7 {
+    width: 100%;
+    margin-left: auto;
+    left: auto;
+    right: auto;
+  }
+  
+  
+  @media only screen and (min-width: 601px) {
+    .col.m5 {
+      width: 41.6666666667%;
+      float: left;
+    }
+  
+    .col.m7 {
+      width: 58.3333333333%;
+      float: right;
+    }
+  }
+  .mapouter {
+    position: relative;
+    text-align: right;
+    height: 100%;
+    width: 100%;
+  }
+  .gmap_canvas {
+    overflow: hidden;
+    background: none !important;
+    height: 100%;
+    width: 100%;
+  }
+  
