@@ -37,7 +37,7 @@ function navbar() {
                   <li>Predict</li>
                 </Link>
 
-                <Link to="/contactUs" className="link">
+                <Link to="/contact-us" className="link">
                   <li>Contact Us</li>
                 </Link>
 
@@ -73,7 +73,7 @@ function navbar() {
                   <li>Predict</li>
                 </Link>
 
-                <Link to="/contactUs" className="link">
+                <Link to="/contact-us" className="link">
                   <li>Contact Us</li>
                 </Link>
 

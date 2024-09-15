@@ -25,8 +25,11 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
-.href {
-  color: #1492fa;
+
+h2{
+  color: #776E9A;
+  font-size: 30px;
+  font-weight: 600;
 }
 
 code {
@@ -37,10 +40,6 @@ code {
 code {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
     Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
-}
-h2 {
-  font-size: 30px;
-  color: #1492fa;
 }
 
 .link {
@@ -61,40 +60,6 @@ h2 {
   font-size: 30px;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
     Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
-}
-.content {
-  display: flex;
-  height: min-content;
-  margin: 2% 0%;
-  border-bottom: 3px solid #1492fa;
-}
-
-.content .summary {
-  width: 50%;
-  height: max-content;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  padding-left: 0px;
-}
-.content .rec {
-  width: 50%;
-  padding: 20px 0;
-  margin: 20px 0 20px 20px;
-  background-color: rgba(20, 146, 250, 0.1);
-}
-
-.content img {
-  width: 80%;
-}
-.summary h2 {
-  float: left;
-}
-.summary p {
-  text-align: justify;
-  line-height: 22px;
-  border-left: 5px solid #1492fa;
-  padding: 0% 0 0% 5%;
 }
 
 .nav2 {
@@ -121,21 +86,6 @@ h2 {
 .search h2 {
   display: flex;
   align-items: flex-start;
-}
-
-.search button {
-  padding: 1% 2%;
-  margin: 6%;
-  background-color: rgba(20, 146, 250, 0.31);
-
-  border-radius: 5px;
-  border: 1px solid rgba(20, 146, 250, 0.31);
-}
-
-.search button:hover {
-  cursor: pointer;
-  background-color: #1492fa;
-  color: #ffffff;
 }
 
 .active {
@@ -205,7 +155,6 @@ h2 {
 .htuImg {
   width: max-content;
   height: max-content;
-  /* margin-top: 10%; */
 }
 
 #combo-box-demo {
@@ -220,27 +169,6 @@ h2 {
   footer {
     font-size: 10px;
   }
-  .content {
-    display: flex;
-    flex-direction: column;
-    margin: 2% 5%;
-    border-bottom: 3px solid #1492fa;
-  }
-  .content .summary {
-    width: 100%;
-    height: max-content;
-    padding-left: 0%;
-  }
-  .content .rec {
-    width: 100%;
-    background-color: rgba(20, 146, 250, 0.1);
-    margin: 0;
-  }
-
-  .content img {
-    width: 90%;
-  }
-
   .nav li {
     font-size: 10px;
   }
@@ -294,12 +222,7 @@ h2 {
   footer {
     font-size: 12px;
   }
-  .content {
-    display: flex;
-    flex-direction: column;
-    margin: 2% 5%;
-    border-bottom: 3px solid #1492fa;
-  }
+
   .nutrition .one {
     display: flex;
     flex-direction: row;
@@ -309,19 +232,6 @@ h2 {
   .advanced h2 {
     font-size: 1em;
     float: left;
-  }
-  .content .summary {
-    width: 100%;
-    height: max-content;
-    padding-left: 0%;
-  }
-  .content .rec {
-    width: 100%;
-    margin: 0;
-  }
-
-  .content img {
-    width: 90%;
   }
   link li {
     font-size: 20px;
