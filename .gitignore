@@ -1,1 +1,17 @@
+.vscode/*
+!.vscode/extensions.json
+.idea
 .DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+/server/package-lock.json
+/server/node_modules
+/server/.env
+
+/client/package-lock.json
+/client/node_modules
+/client/.env
