@@ -26,11 +26,11 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-h2{
+/* h2{
   color: #776E9A;
   font-size: 30px;
   font-weight: 600;
-}
+} */
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",

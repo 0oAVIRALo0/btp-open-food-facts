@@ -9,7 +9,7 @@ function ContactUs() {
         <div className="grey_card">
           <div className="row">
             <div className="col m5">
-              <h2>Contact Us</h2>
+              <h2 style={{color: '#e69c52'}}>Contact Us</h2>
               <p>
                 Prof. Ganesh Bagler<br/>
                 <a href="https://ccb.iiitd.ac.in/" className="my_link">

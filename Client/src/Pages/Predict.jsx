@@ -6,6 +6,14 @@ import {nutrientData, meanMedian, test12Data, test65Data, test102Data, test12Dat
 import {InputLabel, Container, Button, CircularProgress, Slider, InputAdornment, TextField} from "@mui/material";
 import { Button as AntdButton, Modal, Select} from 'antd';
 import {CaretDownOutlined} from '@ant-design/icons';
+import { PiStepsFill } from "react-icons/pi";
+import { PiLeafFill } from "react-icons/pi";
+import { FaHeart } from "react-icons/fa";
+import { GiWeightLiftingUp } from "react-icons/gi";
+import { HiBolt } from "react-icons/hi2";
+import { BsFillDropletFill } from "react-icons/bs";
+import PredictBanner from "/svg/PredictBanner.svg";
+
 
 function getRandomInteger(maxIndex) {
   return Math.floor(Math.random() * (maxIndex + 1));
@@ -17,6 +25,14 @@ function formatTitle(string) {
     .replace(/([a-z])([A-Z])/g, "$1 $2");
 }
 
+const nutrients = [
+  { id: 1, logo: <PiStepsFill />, heading: "Macronutrients", examples: "Calories, Carbs, Fats, Protein" },
+  { id: 2, logo: <PiLeafFill />, heading: "Micronutrients", examples: "Magnesium, Iron, Zinc, Copper" },
+  { id: 3, logo: <FaHeart/>, heading: "Vitamins", examples: "Vitamin A, B1, B2, B3, B5, B6, B9, B12, C, D, E, K" },
+  { id: 4, logo: <GiWeightLiftingUp />, heading: "Minerals", examples: "Calcium, Phosphorus, Potassium, Sodium" },
+  { id: 5, logo: <HiBolt />, heading: "Amino Acids", examples: "Tryptophan, Threonine, Isoleucine, Leucine, Lysine, Methionine, Phenylalanine, Valine, Histidine" },
+  { id: 6, logo: <BsFillDropletFill />, heading: "Fatty Acids", examples: "Saturated, Monounsaturated, Polyunsaturated" },
+]
 function Predict() {
   const [nutrientLevel, setNutrientLevel] = useState("");
   const [clicked, setClicked] = useState(false);
@@ -90,33 +106,38 @@ function Predict() {
       <div className="predict__wrapper">
         {!clicked ? (
           <div className="nutrient-select-container">
-            <div className="left">
-              <div className="predict-nutrient-drop-down">
-                
-                <label>Select Nutrient Levle</label>
-                <Select placeholder="Select Nutrient Level" className="edit-select-input"  onChange={e=>setNutrientLevel(e)} suffixIcon={<CaretDownOutlined style={{color:'#000000'}}/>}
-                  options={[
-                    {label:'7 Nutrients', value:"7Nutrients"},
-                    {label:'8 Nutrients', value:"8Nutrients"},
-                    {label:'45 Nutrients', value:"45Nutrients"},
-                  ]}
-                  getPopupContainer={trigger => trigger.parentElement}/> 
+            <div className="banner" style={{backgroundImage: `url(${PredictBanner})`}}>
+              <div className="info">
+                <div className="overlay-text">
+                  <h2>Explore the NOVA class of any food based on it's nutrient content</h2>
+                </div> 
+                <div className="predict-nutrient-drop-down">
+                    <Select placeholder="Select Nutrient Level" className="edit-select-input"  onChange={e=>setNutrientLevel(e)} suffixIcon={<CaretDownOutlined style={{color:'#000000'}}/>}
+                      options={[
+                        {label:'7 Nutrients', value:"7Nutrients"},
+                        {label:'8 Nutrients', value:"8Nutrients"},
+                        {label:'45 Nutrients', value:"45Nutrients"},
+                      ]}
+                    getPopupContainer={trigger => trigger.parentElement}/> 
+                    <Button
+                      className="button"
+                      onClick={() => setClicked(true)}
+                      disabled={!nutrientLevel}
+                      variant="contained"
+                    >
+                      Next
+                    </Button>
+                </div>
               </div>
-              <Button
-                className="button"
-                onClick={() => setClicked(true)}
-                disabled={!nutrientLevel}
-                variant="contained"
-              >
-                Next
-              </Button>
             </div>
-            <div className="right">
-              <img
-                className="logo"
-                src="/svg/select_nutrient.svg"
-                alt="Select Nutrient"
-              />
+            <div className="nutrients">
+              {nutrients.map((nutrient) => (
+                <div key={nutrient.id} className="nutrient">
+                  <div className="logo">{nutrient.logo}</div>
+                  <h3>{nutrient.heading}</h3>
+                  <p>{nutrient.examples}</p>
+                </div>
+              ))}
             </div>
           </div>
         ) : (
