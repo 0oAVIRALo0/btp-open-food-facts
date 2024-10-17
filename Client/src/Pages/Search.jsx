@@ -3,7 +3,22 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
-import {Box, Container, Autocomplete, Tab, Tabs, Checkbox, FormControl, FormControlLabel, FormGroup, Button, FormHelperText, InputLabel, Slider, TextField} from "@mui/material";
+import {
+  Box,
+  Container,
+  Autocomplete,
+  Tab,
+  Tabs,
+  Checkbox,
+  FormControl,
+  FormControlLabel,
+  FormGroup,
+  Button,
+  FormHelperText,
+  InputLabel,
+  Slider,
+  TextField,
+} from "@mui/material";
 
 function Search() {
   const [macroClass, setMacroClass] = useState("");
@@ -26,7 +41,7 @@ function Search() {
     Cholesterol: [0.0, 62.7],
     "Fatty acids, total saturated": [0.0, 8.71],
     Potassium: [0.0, 518.72],
-    Energy: [57.82, 408.16]
+    Energy: [57.82, 408.16],
   });
 
   const handleChange = (event, newValue) => {
@@ -37,13 +52,13 @@ function Search() {
     novaClass1: false,
     novaClass2: false,
     novaClass3: false,
-    novaClass4: false
+    novaClass4: false,
   });
 
   const handleChangeNovaClass = (event) => {
     setState({
       ...state,
-      [event.target.name]: event.target.checked
+      [event.target.name]: event.target.checked,
     });
   };
 
@@ -142,7 +157,7 @@ function Search() {
                   justifyContent: "space-between",
                   gap: "20px",
                   flexWrap: "wrap",
-                  alignItems: "self-start"
+                  alignItems: "self-start",
                 }}
               >
                 <div className="form__wrapper">
@@ -153,7 +168,7 @@ function Search() {
                         display: "flex",
                         alignItems: "center",
                         marginTop: "4px",
-                        gap: "20px"
+                        gap: "20px",
                       }}
                     >
                       <span>
@@ -194,7 +209,7 @@ function Search() {
                         display: "flex",
                         alignItems: "center",
                         marginTop: "4px",
-                        gap: "20px"
+                        gap: "20px",
                       }}
                     >
                       <span>
@@ -234,7 +249,7 @@ function Search() {
                         display: "flex",
                         alignItems: "center",
                         marginTop: "4px",
-                        gap: "20px"
+                        gap: "20px",
                       }}
                     >
                       <span>
@@ -270,7 +285,7 @@ function Search() {
               <h2 style={{ textAlign: "left" }}>NOVA Class</h2>
               <div
                 style={{
-                  display: "flex"
+                  display: "flex",
                 }}
               >
                 <FormControl
@@ -341,7 +356,7 @@ function Search() {
                   display: "flex",
                   justifyContent: "center",
                   alignItems: "center",
-                  minHeight: "240px"
+                  minHeight: "240px",
                 }}
               >
                 <div className="form__wrapper">
@@ -355,7 +370,7 @@ function Search() {
                           style={{
                             display: "flex",
                             alignItems: "center",
-                            gap: "20px"
+                            gap: "20px",
                           }}
                         >
                           <span style={{ width: "90%" }}>
@@ -367,7 +382,7 @@ function Search() {
                               onChange={(e) => {
                                 setNutritionInfo((nutritionInfo) => ({
                                   ...nutritionInfo,
-                                  [column]: e.target.value
+                                  [column]: e.target.value,
                                 }));
                               }}
                               aria-label="Default"
@@ -412,7 +427,7 @@ const metadata = {
     range: [0.0, 14.26],
     mean: 6.71,
     median: 4.55,
-    unit: "g"
+    unit: "g",
   },
   "Total Fat": {
     min: 0.0,
@@ -420,7 +435,7 @@ const metadata = {
     range: [0.0, 25.05],
     mean: 9.88,
     median: 3.6,
-    unit: "g"
+    unit: "g",
   },
   Carbohydrate: {
     min: 0.0,
@@ -428,7 +443,7 @@ const metadata = {
     range: [2.19, 59.25],
     mean: 30.72,
     median: 18.33,
-    unit: "g"
+    unit: "g",
   },
   "Sugars, total": {
     min: 0.0,
@@ -436,7 +451,7 @@ const metadata = {
     range: [0.0, 31.5],
     mean: 13.72,
     median: 6.4,
-    unit: "g"
+    unit: "g",
   },
   "Fiber, total dietary": {
     min: 0.0,
@@ -444,7 +459,7 @@ const metadata = {
     range: [0.0, 6.21],
     mean: 2.29,
     median: 1.2,
-    unit: "g"
+    unit: "g",
   },
   Calcium: {
     min: 0.0,
@@ -452,7 +467,7 @@ const metadata = {
     range: [0.0, 283.17],
     mean: 93.79,
     median: 37.0,
-    unit: "mg"
+    unit: "mg",
   },
   Iron: {
     min: 0.0,
@@ -460,7 +475,7 @@ const metadata = {
     range: [0.0, 9.07],
     mean: 2.76,
     median: 0.99,
-    unit: "mg"
+    unit: "mg",
   },
   Sodium: {
     min: 0.0,
@@ -468,7 +483,7 @@ const metadata = {
     range: [0.0, 1171.91],
     mean: 357.31,
     median: 213.0,
-    unit: "mg"
+    unit: "mg",
   },
   "Vitamin D (D2 + D3)": {
     min: 0.0,
@@ -476,7 +491,7 @@ const metadata = {
     range: [0.0, 2.1],
     mean: 0.49,
     median: 0.0,
-    unit: "mcg"
+    unit: "mcg",
   },
   Cholesterol: {
     min: 0.0,
@@ -484,7 +499,7 @@ const metadata = {
     range: [0.0, 62.7],
     mean: 16.37,
     median: 0.0,
-    unit: "mg"
+    unit: "mg",
   },
   "Fatty acids, total saturated": {
     min: 0.0,
@@ -492,7 +507,7 @@ const metadata = {
     range: [0.0, 8.71],
     mean: 3.21,
     median: 1.11,
-    unit: "g"
+    unit: "g",
   },
   Potassium: {
     min: 0.0,
@@ -500,7 +515,7 @@ const metadata = {
     range: [0.0, 518.72],
     mean: 220.96,
     median: 158.0,
-    unit: "mg"
+    unit: "mg",
   },
   Energy: {
     min: 0.0,
@@ -508,8 +523,8 @@ const metadata = {
     range: [57.82, 408.16],
     mean: 232.99,
     median: 222.0,
-    unit: "kcal"
-  }
+    unit: "kcal",
+  },
 };
 const nutritionList = [
   "Protein",
@@ -524,5 +539,5 @@ const nutritionList = [
   "Cholesterol",
   "Fatty acids, total saturated",
   "Potassium",
-  "Energy"
+  "Energy",
 ];

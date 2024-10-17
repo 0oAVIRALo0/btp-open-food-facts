@@ -16,6 +16,7 @@ dist-ssr
 
 datasets/
 .env
+es
 
 # Editor directories and files
 .vscode/*

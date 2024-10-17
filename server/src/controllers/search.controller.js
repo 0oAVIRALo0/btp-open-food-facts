@@ -6,247 +6,67 @@ import { Client } from "@elastic/elasticsearch";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import fs from "fs";
 
-const ES_INDEX = "open-food-facts-search-data-2024.09.16";
-const columnNames = [
-  "Food_code",
-  "Protein,Total",
-  "Fat",
-  "Carbohydrate",
-  "Sugars, total",
-  "Fiber, total dietary",
-  "Calcium",
-  "Iron",
-  "Sodium",
-  "Vitamin D (D2 + D3)",
-  "Cholesterol",
-  "Fatty acids, total saturated",
-  "Potassium",
-  "Energy",
-  "Main_food_description",
-  "catnumb",
-  "catname",
-  "novaclass",
-  "macroclass",
-];
+const ES_INDEX = "open-food-facts-dataset-2024.10.16";
 
 const client = new Client({
   node: process.env.ES_NODE,
   auth: {
     username: process.env.USERNAME,
     password: process.env.PASSWORD,
+    apiKey: process.env.ES_API_KEY,
   },
   tls: {
-    ca: fs.readFileSync(process.env.ES_TLS_CERT),
+    ca: fs.readFileSync(
+      "/Users/aviralchauhan/aws-es-kibana/elasticsearch-8.15.1/config/certs/http_ca.crt"
+    ),
     rejectUnauthorized: false,
   },
 });
 
-const searchMacroClass = asyncHandler(async (req, res) => {
+const searchCategories = asyncHandler(async (req, res) => {
   try {
+    const pageNumber = parseInt(req.query.pageNumber) || 1;
+    const entriesPerPage = parseInt(req.query.entriesPerPage) || 50;
+    const from = (pageNumber - 1) * entriesPerPage;
+
+    // fetch the specific entries for the requested page
     const searchResult = await client.search({
       index: ES_INDEX,
-      size: 0,
-      body: {
-        aggs: {
-          unique_macroclass: {
-            terms: {
-              field: "macroclass.keyword",
-              size: 10000,
-            },
-          },
-        },
-      },
-    });
-
-    console.log(
-      "Full Elasticsearch response:",
-      JSON.stringify(searchResult, null, 2)
-    );
-
-    let uniqueMacroclasses;
-    if (searchResult.aggregations) {
-      uniqueMacroclasses =
-        searchResult.aggregations.unique_macroclass.buckets.map(
-          (bucket) => bucket.key
-        );
-      console.log("Unique macroclass values:", uniqueMacroclasses);
-    } else {
-      console.log("No aggregations found in the response");
-    }
-
-    res.status(200).json({
-      success: true,
-      data: {
-        uniqueMacroclasses: uniqueMacroclasses,
-      },
-    });
-  } catch (error) {
-    console.error("Elasticsearch query error:", error);
-    res.status(500).json({
-      success: false,
-      message: "An error occurred while querying Elasticsearch",
-    });
-  }
-});
-
-const searchCategoryName = asyncHandler(async (req, res) => {
-  try {
-    const { macroClass } = req.body;
-
-    const searchResult = await client.search({
-      index: ES_INDEX,
-      size: 0,
+      size: entriesPerPage,
+      from: from,
       body: {
         query: {
-          bool: {
-            filter: [{ term: { "macroclass.keyword": macroClass } }],
-          },
-        },
-        aggs: {
-          unique_catname: {
-            terms: {
-              field: "catname.keyword",
-              size: 10000,
-            },
-          },
+          match_all: {},
         },
       },
     });
 
     console.log(
-      "Full Elasticsearch response:",
+      "Full Elasticsearch response for documents:",
       JSON.stringify(searchResult, null, 2)
     );
 
-    let uniqueCategoryNames;
-    if (searchResult.aggregations) {
-      uniqueCategoryNames =
-        searchResult.aggregations.unique_catname.buckets.map(
-          (bucket) => bucket.key
+    // Extract the documents for the current page
+    const documents = searchResult.hits.hits.map((hit) => hit._source);
+
+    // Now, get unique categories from the documents for this page
+    const uniqueCategoriesSet = new Set();
+    documents.forEach((doc) => {
+      if (Array.isArray(doc.categories_en)) {
+        doc.categories_en.forEach((category) =>
+          uniqueCategoriesSet.add(category.trim())
         );
-      console.log("Unique categories values:", uniqueCategoryNames);
-    } else {
-      console.log("No aggregations found in the response");
-    }
-
-    res.status(200).json({
-      success: true,
-      data: {
-        uniqueCategoryNames: uniqueCategoryNames || [],
-      },
-    });
-  } catch (error) {
-    console.error("Elasticsearch query error:", error);
-    res.status(500).json({
-      success: false,
-      message: "An error occurred while querying Elasticsearch",
-    });
-  }
-});
-
-const searchFoodDescription = asyncHandler(async (req, res) => {
-  try {
-    const { categoryName } = req.body;
-
-    const searchResult = await client.search({
-      index: ES_INDEX,
-      size: 0,
-      body: {
-        query: {
-          bool: {
-            filter: [{ term: { "catname.keyword": categoryName } }],
-          },
-        },
-        aggs: {
-          food_descriptions: {
-            terms: {
-              field: "Main_food_description.keyword",
-              size: 10000,
-            },
-          },
-        },
-      },
-    });
-
-    console.log(
-      "Full Elasticsearch response:",
-      JSON.stringify(searchResult, null, 2)
-    );
-
-    let foodDescriptions;
-    if (searchResult.aggregations) {
-      foodDescriptions =
-        searchResult.aggregations.food_descriptions.buckets.map(
-          (bucket) => bucket.key
-        );
-      console.log("Food descriptions:", foodDescriptions);
-    } else {
-      console.log("No aggregations found in the response");
-    }
-
-    res.status(200).json({
-      success: true,
-      data: {
-        foodDescriptions: foodDescriptions || [],
-      },
-    });
-  } catch (error) {
-    console.error("Elasticsearch query error:", error);
-    res.status(500).json({
-      success: false,
-      message: "An error occurred while querying Elasticsearch",
-    });
-  }
-});
-
-const searchNutrients = asyncHandler(async (req, res) => {
-  try {
-    const { macroClass, categoryName, foodDescription } = req.body;
-
-    const searchResult = await client.search({
-      index: ES_INDEX,
-      body: {
-        query: {
-          bool: {
-            must: [
-              macroClass
-                ? { term: { "macroclass.keyword": macroClass } }
-                : null,
-              categoryName
-                ? { term: { "catname.keyword": categoryName } }
-                : null,
-              foodDescription
-                ? { term: { "Main_food_description.keyword": foodDescription } }
-                : null,
-            ].filter(Boolean),
-          },
-        },
-      },
-    });
-
-    console.log(
-      "Full Elasticsearch response:",
-      JSON.stringify(searchResult, null, 2)
-    );
-
-    const hits = searchResult.hits.hits;
-
-    const nutrientDetails = hits.map((hit) => {
-      const nutrients = {};
-      for (const column of columnNames) {
-        if (hit._source[column] !== undefined) {
-          nutrients[column] = hit._source[column];
-        }
+      } else {
+        uniqueCategoriesSet.add(doc.categories_en.trim());
       }
-      return nutrients;
     });
 
-    console.log("Nutrient details: ", nutrientDetails);
+    const uniqueCategories = Array.from(uniqueCategoriesSet);
 
     res.status(200).json({
       success: true,
       data: {
-        nutrientDetails: nutrientDetails,
+        uniqueCategories,
       },
     });
   } catch (error) {
@@ -258,9 +78,110 @@ const searchNutrients = asyncHandler(async (req, res) => {
   }
 });
 
-export {
-  searchMacroClass,
-  searchCategoryName,
-  searchFoodDescription,
-  searchNutrients,
-};
+const searchNovaGroups = asyncHandler(async (req, res) => {
+  try {
+    const pageNumber = parseInt(req.query.pageNumber) || 1;
+    const entriesPerPage = parseInt(req.query.entriesPerPage) || 50;
+    const from = (pageNumber - 1) * entriesPerPage;
+
+    const novaGroup = req.query.novaGroup;
+    console.log("novaGroup:", novaGroup);
+    const novaGroups = novaGroup ? novaGroup.split(",").map(Number) : [];
+    console.log("novaGroups:", novaGroups);
+
+    const query = {
+      query: {
+        bool: {
+          must:
+            novaGroups.length > 0
+              ? [
+                  {
+                    terms: {
+                      nova_group: novaGroups,
+                    },
+                  },
+                ]
+              : [],
+        },
+      },
+      size: entriesPerPage,
+      from: from,
+    };
+
+    const searchResult = await client.search({
+      index: ES_INDEX,
+      body: query,
+    });
+
+    console.log(
+      "Full Elasticsearch response for nova groups:",
+      JSON.stringify(searchResult, null, 2)
+    );
+
+    const documents = searchResult.hits.hits.map((hit) => hit._source);
+
+    if (documents.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No documents found for the specified NOVA group(s).",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: {
+        documents,
+        totalCount: documents.length,
+      },
+    });
+  } catch (error) {
+    console.error("Elasticsearch query error:", error);
+    res.status(500).json({
+      success: false,
+      message:
+        "An error occurred while querying Elasticsearch for NOVA groups.",
+    });
+  }
+});
+
+const searchAll = asyncHandler(async (req, res) => {
+  try {
+    const pageNumber = parseInt(req.query.pageNumber) || 1;
+    const entriesPerPage = parseInt(req.query.entriesPerPage) || 50;
+    const from = (pageNumber - 1) * entriesPerPage;
+
+    const searchResult = await client.search({
+      index: ES_INDEX,
+      size: entriesPerPage,
+      from: from,
+      body: {
+        query: {
+          match_all: {},
+        },
+      },
+    });
+
+    console.log(
+      "Full Elasticsearch response for documents:",
+      JSON.stringify(searchResult, null, 2)
+    );
+
+    // Extract the documents for the current page
+    const documents = searchResult.hits.hits.map((hit) => hit._source);
+
+    res.status(200).json({
+      success: true,
+      data: {
+        documents: documents,
+      },
+    });
+  } catch (error) {
+    console.error("Elasticsearch query error:", error);
+    res.status(500).json({
+      success: false,
+      message: "An error occurred while querying Elasticsearch",
+    });
+  }
+});
+
+export { searchCategories, searchNovaGroups, searchAll };
