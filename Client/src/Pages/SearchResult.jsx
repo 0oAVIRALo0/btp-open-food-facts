@@ -3,34 +3,10 @@ import { useSearchParams } from "react-router-dom";
 import axios from "axios";
 
 import { Table } from 'antd';
-import { Container } from "@mui/material";
 
 function SearchResult() {
   const [searchParams] = useSearchParams();
-  const type = searchParams.get("type");
-  const macroClass = searchParams.get("macroclass");
-  const catname = searchParams.get("catname");
-  const description = searchParams.get("description");
   const novaclass = searchParams.get("novaclass")?.split(",").map(Number) || [];
-
-  const parseNutrition = (key) =>
-    searchParams.get(key)?.split(",").map(parseFloat) || [];
-
-  const nutritionInfo = {
-    Protein: parseNutrition("Protein"),
-    "Total Fat": parseNutrition("Total Fat"),
-    Carbohydrate: parseNutrition("Carbohydrate"),
-    "Sugars, total": parseNutrition("Sugars, total"),
-    "Fiber, total dietary": parseNutrition("Fiber, total dietary"),
-    Calcium: parseNutrition("Calcium"),
-    Iron: parseNutrition("Iron"),
-    Sodium: parseNutrition("Sodium"),
-    "Vitamin D (D2 + D3)": parseNutrition("Vitamin"),
-    Cholesterol: parseNutrition("Cholesterol"),
-    "Fatty acids, total saturated": parseNutrition("Fatty acids, total saturated"),
-    Potassium: parseNutrition("Potassium"),
-    Energy: parseNutrition("Energy"),
-  };
 
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -46,14 +22,7 @@ function SearchResult() {
       .post(
         `https://cosylab.iiitd.edu.in/food-processing-db-api/search?page=${page}&pageSize=${limit}`,
         {
-          type,
-          category: {
-            macroclass: macroClass,
-            catname,
-            Main_food_description: description,
-          },
           novaclass,
-          nutrients: nutritionInfo,
         }
       )
       .then((res) => {
@@ -64,13 +33,13 @@ function SearchResult() {
         apiData.map((data) => {
             let obj = {
               _id: data?._id,
-              macroClass: data?.macroclass,
-              categoryName: data?.catname,
-              foodDescription: data?.Main_food_description,
-              protein: data?.Protein,
-              totalFat: data?.['Total Fat'],
-              carbohydrate: data?.Carbohydrate,
-              energy: data?.Energy,
+              product_name: data?.product_name,
+              generic_name: data?.generic_name,
+              quantity: data?.quantity,
+              categories_en: data?.categories_en,
+              nutriscore_grade: data?.nutriscore_grade,
+              ecoscore_score: data?.ecoscore_score,
+              serving_size : data?.serving_size,
               novaClass : data?.novaclass,
             };
             tableData.push(obj);
@@ -89,62 +58,62 @@ function SearchResult() {
 
   const columns = [
     {
-        title: 'Macro Class',
-        dataIndex: 'macroClass',
-        key: 'macroClass',
+        title: 'Product Name',
+        dataIndex: 'product_name',
+        key: 'product_name',
         fixed: 'left',
-        render: (text) => <span style={{color: '#776E9A', display: 'flex', justifyContent: 'center'}}>{text || '-'}</span>,
+        render: (text) => <span style={{color: '#638773', display: 'flex', justifyContent: 'center'}}>{text || '-'}</span>,
         width: '200px',
     }, 
     {
-        title: 'Category Name',
-        dataIndex: 'categoryName',
-        key: 'categoryName',
+        title: 'Genric Name',
+        dataIndex: 'generic_name',
+        key: 'generic_name',
         fixed: 'left',
-        render: (text) => <span style={{color: '#776E9A', display: 'flex', justifyContent: 'center'}}>{text || '-'}</span>,
+        render: (text) => <span style={{color: '#638773', display: 'flex', justifyContent: 'center'}}>{text || '-'}</span>,
         width: '250px',
     },
     {
-        title: 'Food Description',
-        dataIndex: 'foodDescription',
-        key: 'foodDescription',
+        title: 'Quantity',
+        dataIndex: 'quantity',
+        key: 'quantity',
         fixed: 'left',
-        render: (text) => <span style={{color: '#776E9A'}}>{text || '-'}</span>,
-        width: '400px',
-    },
-    {
-        title: 'Protein',
-        dataIndex: 'protein',
-        key: 'protein',
-        render: (text) => <span style={{color: '#776E9A', display: 'flex', justifyContent: 'center'}}>{text || '-'}</span>,
+        render: (text) => <span style={{color: '#638773'}}>{text || '-'}</span>,
         width: '200px',
     },
     {
-        title: 'Total Flat',
-        dataIndex: 'totalFat',
+        title: 'Categories',
+        dataIndex: 'categories_en',
+        key: 'categories_en',
+        render: (text) => <span style={{color: '#638773', display: 'flex', justifyContent: 'center'}}>{text || '-'}</span>,
+        width: '200px',
+    },
+    {
+      title: 'Nova Class',
+      dataIndex: 'novaClass',
+      key: 'novaClass',
+      render: (text) => <span style={{color: '#638773', display: 'flex', justifyContent: 'center'}}>{text || '-'}</span>,
+      width: '200px',
+    },
+    {
+        title: 'Nutrition Score',
+        dataIndex: 'nutriscore_grade',
         key: 'totalFat',
-        render: (text) => <span style={{color: '#776E9A', display: 'flex', justifyContent: 'center'}}>{text || '-'}</span>,
+        render: (text) => <span style={{color: '#638773', display: 'flex', justifyContent: 'center'}}>{text || '-'}</span>,
         width: '200px',
     },
     {
-        title: 'Carbohydrate',
-        dataIndex: 'carbohydrate',
+        title: 'Ecoscore Score',
+        dataIndex: 'ecoscore_score',
         key: 'carbohydrate',
-        render: (text) => <span style={{color: '#776E9A', display: 'flex', justifyContent: 'center'}}>{text || '-'}</span>,
+        render: (text) => <span style={{color: '#638773', display: 'flex', justifyContent: 'center'}}>{text || '-'}</span>,
         width: '200px',
     },
     {
-        title: 'Energy',
-        dataIndex: 'energy',
-        key: 'energy',
-        render: (text) => <span style={{color: '#776E9A', display: 'flex', justifyContent: 'center'}}>{text || '-'}</span>,
-        width: '200px',
-    },
-    {
-        title: 'Nova Class',
-        dataIndex: 'novaClass',
-        key: 'novaClass',
-        render: (text) => <span style={{color: '#776E9A', display: 'flex', justifyContent: 'center'}}>{text || '-'}</span>,
+        title: 'Serving Size',
+        dataIndex: 'serving_size',
+        key: 'serving_size',
+        render: (text) => <span style={{color: '#638773', display: 'flex', justifyContent: 'center'}}>{text || '-'}</span>,
         width: '200px',
     },
   ];
@@ -155,7 +124,6 @@ function SearchResult() {
 
   return (
     <div className="searcResult-wrapper">
-      {/* <h2 style={{ textAlign: "left" }}>Showing all food results</h2> */}
       <div className="container">
         <Table
             columns={columns}

@@ -1,7 +1,7 @@
 import React from 'react'
 import { Routes, Route} from "react-router-dom";
 
-import {NavBar, Footer} from './Components';
+import {NavBar} from './Components';
 import {LandinPage, Search, SearchResult, Predict, ContactUs} from './Pages';
 
 import "./sass/base.scss";

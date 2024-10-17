@@ -14,6 +14,10 @@ import { HiBolt } from "react-icons/hi2";
 import { BsFillDropletFill } from "react-icons/bs";
 import PredictBanner from "/svg/PredictBanner.svg";
 
+import NOVA1 from "/svg/NOVA1.svg"
+import NOVA2 from "/svg/NOVA2.svg"
+import NOVA3 from "/svg/NOVA3.svg"
+import NOVA4 from "/svg/NOVA4.svg"
 
 function getRandomInteger(maxIndex) {
   return Math.floor(Math.random() * (maxIndex + 1));
@@ -33,6 +37,39 @@ const nutrients = [
   { id: 5, logo: <HiBolt />, heading: "Amino Acids", examples: "Tryptophan, Threonine, Isoleucine, Leucine, Lysine, Methionine, Phenylalanine, Valine, Histidine" },
   { id: 6, logo: <BsFillDropletFill />, heading: "Fatty Acids", examples: "Saturated, Monounsaturated, Polyunsaturated" },
 ]
+
+const novaClasses = [
+  { 
+    id: 1, 
+    image: NOVA1, 
+    heading: "Unprocessed or Minimally Processed Foods", 
+    subheading: "This class encompasses all edible parts of plants, animals, and fungi that are obtained directly from nature. The primary focus is on preserving their natural state and nutritional value without any significant alterations or additives.", 
+    examples: "fresh, frozen or dried fruit, vegetables, legumes, nuts, seeds, whole grains, eggs, fresh or frozen meat, fish, shellfish, poultry, milk, yogurt, cheese, oil, vinegar, sugar,"
+  },
+  { 
+    id: 2, 
+    image: NOVA2, 
+    heading: "Processed Culinary Ingredients", 
+    subheading: "This category includes ingredients derived from unprocessed foods that have undergone minimal processing. These ingredients are primarily used in the preparation of meals, enhancing flavor and texture without the use of artificial additives.", 
+    examples: "flour, butter, oil, sugar, honey, maple syrup, salt, pepper, herbs, spices, baking powder, baking soda, chocolate, pasta, rice, bread, tofu, tempeh, miso, canned tomatoes, tomato paste"
+  },
+  { 
+    id: 3, 
+    image: NOVA3, 
+    heading: "Processed Foods", 
+    subheading: "Processed foods refer to items that have been altered from their original form through methods like freezing, canning, or baking. These products are often convenient and ready-to-eat, but they may contain additional ingredients for preservation or flavor.", 
+    examples: "bread, crackers, cheese, yogurt, canned beans, canned fish, canned tomatoes, frozen fruits, frozen vegetables, tofu, tempeh, miso, hummus, nut butter, seed butter, fruit preserves, pickles, sauerkraut"
+  },
+  { 
+    id: 4, 
+    image: NOVA4, 
+    heading: "Ultra-Processed Food and Drink Products", 
+    subheading: "This class consists of highly processed food and drink products that contain artificial ingredients, flavor enhancers, and preservatives. These items are often high in sugar, salt, and unhealthy fats, making them less nutritious and more addictive.", 
+    examples: "packaged snacks, sugary cereals, sweetened yogurt, candy, soda, sports drinks, energy drinks, sweetened iced tea, sweetened lemonade, sweetened iced coffee, sweetened juice drinks,"
+  }
+]
+
+
 function Predict() {
   const [nutrientLevel, setNutrientLevel] = useState("");
   const [clicked, setClicked] = useState(false);
@@ -56,10 +93,6 @@ function Predict() {
     setNutritionInfo(dummyData[0]);
   }, [dummyData]);
 
-  const handleChangeSelect = (event) => {
-    setNutrientLevel(event.target.value);
-  };
-
   const onPredict = (val) => {
     setPredictModal(true);
     setLoading(true);
@@ -79,20 +112,12 @@ function Predict() {
       .then((res) => {
         setLoading(false);
         console.log(res);
-        let temp = "";
-        if (res?.data?.data?.Classification == 1)
-          temp = "Unprocessed (NOVA Class 1)";
-        else if (res?.data?.data?.Classification == 2)
-          temp = "Processed Culinary Ingredients (NOVA Class 2)";
-        else if (res?.data?.data?.Classification == 3)
-          temp = "Processed (NOVA Class 3)";
-        else if (res?.data?.data?.Classification == 4)
-          temp = "Ultra-Processed (NOVA Class 4)";
-        setResult(temp);
+        setResult(novaClasses.find(nova => nova.id === res?.data?.data?.Classification))
       })
       .catch((err) => {
         setLoading(false);
         setResult("Error");
+        // setResult(novaClasses.find(nova => nova.id === 1))
       });
   };
 
@@ -142,22 +167,21 @@ function Predict() {
           </div>
         ) : (
           <>
-            {Object.keys(nutrientData?.[nutrientLevel]).map((ty, ind) => {
-              return (
-                <span key={ind}>
-                  <h2 style={{ textAlign: "left" }}>
-                    {formatTitle(
-                      Object.keys(nutrientData?.[nutrientLevel]?.[ty])?.[0]
-                    )}
-                  </h2>
-                  <div className="form__wrapper">
-                    {Object.values(
-                      nutrientData?.[nutrientLevel]?.[ty]
-                    )?.[0]?.map((column, index) => {
-                      const uniqueId = `${column}-${index}`;
+            {Object.keys(nutrientData?.[nutrientLevel]).map((ty, ind) => (
+              <span key={ind}>
+                <h2 style={{ textAlign: "left" }}>
+                  {formatTitle(
+                    Object.keys(nutrientData?.[nutrientLevel]?.[ty])?.[0]
+                  )}
+                </h2>
+                <div className="form__wrapper">
+                  {Object.values(nutrientData?.[nutrientLevel]?.[ty])?.[0]?.map(
+                    (column, index) => {
+                      const uniqueId = `${column}-${ty}-${index}`; // Ensure unique ID
+
                       return (
-                        <div className="form__content" key={index}>
-                          <InputLabel htmlFor={uniqueId}>{column}</InputLabel>
+                        <div className="form__content" key={uniqueId}>
+                          <label htmlFor={`slider-${uniqueId}`} style={{color: "#e69c52"}}>{column}</label>
                           <div
                             style={{
                               display: "flex",
@@ -167,21 +191,13 @@ function Predict() {
                           >
                             <span style={{ width: "70%" }}>
                               <Slider
-                                id={uniqueId}
-                                color={
-                                  ind === 0
-                                    ? "primary"
-                                    : ind === 1
-                                    ? "warning"
-                                    : "secondary"
-                                }
+                                id={`slider-${uniqueId}`}
+                                color="success" // Green color
                                 min={
-                                  meanMedian?.[nutrientLevel]?.[column]?.min ||
-                                  0
+                                  meanMedian?.[nutrientLevel]?.[column]?.min || 0
                                 }
                                 max={
-                                  meanMedian?.[nutrientLevel]?.[column]?.max ||
-                                  100
+                                  meanMedian?.[nutrientLevel]?.[column]?.max || 100
                                 }
                                 value={Number(nutritionInfo?.[column]) || 0}
                                 onChange={(e) => {
@@ -196,7 +212,7 @@ function Predict() {
                             </span>
                             <span style={{ width: "30%" }}>
                               <TextField
-                                id="filled-basic"
+                                id={`input-${uniqueId}`}
                                 value={nutritionInfo?.[column]}
                                 type="number"
                                 onChange={(e) => {
@@ -208,8 +224,8 @@ function Predict() {
                                 InputProps={{
                                   endAdornment: (
                                     <InputAdornment position="end">
-                                      {meanMedian?.[nutrientLevel]?.[column]
-                                        ?.unit || ""}
+                                      {meanMedian?.[nutrientLevel]?.[column]?.unit ||
+                                        ""}
                                     </InputAdornment>
                                   ),
                                 }}
@@ -219,11 +235,11 @@ function Predict() {
                           </div>
                         </div>
                       );
-                    })}
-                  </div>
-                </span>
-              );
-            })}
+                    }
+                  )}
+                </div>
+              </span>
+            ))}
             <div className="button-footer">
               <Button
                 className="button"
@@ -239,9 +255,7 @@ function Predict() {
               </Button>
               <Button
                 className="button"
-                onClick={() => {
-                  setClicked(false);
-                }}
+                onClick={() => setClicked(false)}
                 variant="contained"
               >
                 Back
@@ -264,7 +278,6 @@ function Predict() {
               className="prediction-modal"
               onCancel={() => setPredictModal(false)}
               onOk={() => setPredictModal(false)}
-              title="Prediction Result"
             > 
         
             <div className="wrapper">
@@ -278,15 +291,19 @@ function Predict() {
                   Something Went Wrong
                 </div>
               ) : result ? (
-                <div style={{ fontSize: "24px", padding: "20px 0" }}>
-                  The food is <span style={{ color: "green" }}>{result}</span>
-                </div>
+                <>
+                  <div className="left">
+                    <img src={result.image} alt={`NOVA Class ${result.id} Poster`} width="223px"/>
+                  </div>
+                  <div className="right">
+                    <h2>NOVA Class {result.id}: <span>{result.heading}</span></h2>
+                    <p>{result.subheading}</p>
+                    <p><span>Examples: </span>{result.examples}</p>
+                  </div>
+                </>
               ) : (
                 ""
               )}
-            </div>
-            <div style={{display:'flex', justifyContent:'flex-end'}}>
-              <AntdButton onClick={() => setPredictModal(false)} className="close-button">Ok</AntdButton>
             </div>
           </Modal>
         )}
