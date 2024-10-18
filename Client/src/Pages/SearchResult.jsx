@@ -8,6 +8,9 @@ function SearchResult() {
   const [searchParams] = useSearchParams();
   const type = searchParams.get("type");
   const novaclass = searchParams.get("novaclass")?.split(",").map(Number) || [];
+  const categoryName = searchParams.get("categoryName");
+  const brandName = searchParams.get("brandName");
+  const productName = searchParams.get("productName");
 
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -21,6 +24,9 @@ function SearchResult() {
 
     const formData = new URLSearchParams();
     formData.append("novaclass", novaclass);
+    formData.append("categoryName", categoryName || "");
+    formData.append("brandName", brandName || "");
+    formData.append("productName", productName || "");
 
     axios
       .post(
