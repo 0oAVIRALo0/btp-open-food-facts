@@ -6,6 +6,7 @@ import { Table } from 'antd';
 
 function SearchResult() {
   const [searchParams] = useSearchParams();
+  const type = searchParams.get("type");
   const novaclass = searchParams.get("novaclass")?.split(",").map(Number) || [];
 
   const [data, setData] = useState([]);
@@ -22,6 +23,7 @@ function SearchResult() {
       .post(
         `https://cosylab.iiitd.edu.in/food-processing-db-api/search?page=${page}&pageSize=${limit}`,
         {
+          type: type,
           novaclass,
         }
       )

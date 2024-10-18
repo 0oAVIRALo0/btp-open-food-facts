@@ -615,9 +615,17 @@ function Search() {
     if (state?.novaClass4) {
       novaclass.push(4);
     }
+
+    const type =
+    value == 0
+      ? "novaclass"
+      : value == 1
+      ? "category"
+      : "";
+
     localStorage.setItem("activeNavBar", 2); 
     navigate(
-      `/search-result?novaclass=${novaclass}`
+      `/search-result?type=${type}&novaclass=${novaclass}`
     );
   };
 
