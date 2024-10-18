@@ -62,7 +62,7 @@ function SearchResult() {
         setData(tableData);
         setTableParams((prev) => ({
           ...prev,
-          total: res.data.data.totalCount,
+          total: res.data.data.totalLength,
         }));
         setLoading(false);
       })

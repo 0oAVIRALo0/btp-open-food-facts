@@ -84,6 +84,7 @@ const getResultByNovaGroup = async (
   novaGroups,
   from
 ) => {
+  const startTime = new Date();
   const query = {
     query: {
       bool: {
@@ -108,12 +109,18 @@ const getResultByNovaGroup = async (
     body: query,
   });
 
+  const endTime = new Date(); // End time
+  const timeTaken = endTime - startTime; // Time in milliseconds
+
   console.log(
     "Full Elasticsearch response for nova groups:",
     JSON.stringify(searchResult, null, 2)
   );
+  console.log(`API call took ${timeTaken} milliseconds.`);
 
   const documents = searchResult.hits.hits.map((hit) => hit._source);
+  console.log("Documents:", documents.length);
+  const maxLength = 10000 - from;
 
   if (documents.length === 0) {
     return {
@@ -125,6 +132,7 @@ const getResultByNovaGroup = async (
   return {
     success: true,
     documents,
+    maxLength,
     novaGroups,
   };
 };
@@ -217,10 +225,12 @@ const getAllData = async (pageNumber, entriesPerPage, from) => {
   );
 
   const documents = searchResult.hits.hits.map((hit) => hit._source);
+  const maxLength = 10000 - from;
 
   return {
     success: true,
     documents,
+    maxLength,
   };
 };
 
@@ -281,6 +291,7 @@ const getResultByCategoryBrandProduct = async (
   );
 
   const documents = searchResult.hits.hits.map((hit) => hit._source);
+  const maxLength = 10000 - from;
 
   if (documents.length === 0) {
     return {
@@ -292,11 +303,49 @@ const getResultByCategoryBrandProduct = async (
   return {
     success: true,
     documents,
+    maxLength,
     category,
     brand,
     product,
   };
 };
+
+const getDocumentById = asyncHandler(async (req, res) => {
+  try {
+    const id = req.params.id;
+    const searchResult = await client.search({
+      index: ES_INDEX,
+      body: {
+        query: {
+          match: {
+            _id: id,
+          },
+        },
+      },
+    });
+
+    const documents = searchResult.hits.hits.map((hit) => hit._source);
+
+    if (documents.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No document found for the specified ID.",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: documents[0],
+    });
+  } catch (error) {
+    console.error("Elasticsearch query error:", error);
+    res.status(500).json({
+      success: false,
+      message:
+        "An error occurred while querying Elasticsearch for the specified ID.",
+    });
+  }
+});
 
 const searchResult = asyncHandler(async (req, res) => {
   try {
@@ -330,9 +379,10 @@ const searchResult = asyncHandler(async (req, res) => {
 
     // Handling category, brand, or product query
     if (type === "category") {
-      const category = req.body.category;
-      const brand = req.body.brand;
-      const product = req.body.product;
+      const category = req.body.categoryName;
+      console.log("Category:", category);
+      const brand = req.body.brandName;
+      const product = req.body.productName;
 
       if (!category && !brand && !product) {
         data = await getAllData(pageNumber, entriesPerPage, from);
@@ -367,6 +417,7 @@ const searchResult = asyncHandler(async (req, res) => {
       success: true,
       data: {
         documents: data.documents,
+        totalLength: data.maxLength,
         category: data.category || null,
         brand: data.brand || null,
         product: data.product || null,
@@ -383,4 +434,22 @@ const searchResult = asyncHandler(async (req, res) => {
   }
 });
 
-export { searchCategories, searchResult };
+export { searchCategories, searchResult, getDocumentById };
+
+// const query = {
+//   query: {
+//     bool: {
+//       must:
+//         novaGroups.length > 0
+//           ? [
+//               {
+//                 terms: {
+//                   nova_group: novaGroups,
+//                 },
+//               },
+//             ]
+//           : [],
+//     },
+//   },
+//   // Removed size and from
+// };
