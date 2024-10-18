@@ -6,6 +6,7 @@ import { Table } from "antd";
 
 function SearchResult() {
   const [searchParams] = useSearchParams();
+  const type = searchParams.get("type");
   const novaclass = searchParams.get("novaclass")?.split(",").map(Number) || [];
 
   const [data, setData] = useState([]);
@@ -17,11 +18,18 @@ function SearchResult() {
   });
   const apiCall = (page, limit) => {
     setLoading(true);
+
+    const formData = new URLSearchParams();
+    formData.append("novaclass", novaclass);
+
     axios
-      .get(
-        `http://localhost:8000/api/v1/search/nova-groups?pageNumber=${page}&entriesPerPage=${limit}`,
+      .post(
+        `http://localhost:8000/api/v1/search/search-result?type=${type}&pageNumber=${page}&entriesPerPage=${limit}`,
+        formData,
         {
-          novaclass,
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
         }
       )
       .then((res) => {
@@ -35,12 +43,12 @@ function SearchResult() {
             _id: data?._id,
             product_name: data?.product_name,
             generic_name: data?.generic_name,
-            quantity: data?.quantity,
+            quantity: data?.product_quantity,
             categories_en: data?.categories_en,
             nutriscore_grade: data?.nutriscore_grade,
             ecoscore_score: data?.ecoscore_score,
             serving_size: data?.serving_size,
-            novaClass: data?.novaclass,
+            novaClass: data?.nova_group,
           };
           tableData.push(obj);
         });

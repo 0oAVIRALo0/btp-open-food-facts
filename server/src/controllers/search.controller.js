@@ -197,15 +197,43 @@ const getResultByCategory = async (
   };
 };
 
+const getAllData = async (pageNumber, entriesPerPage, from) => {
+  const query = {
+    query: {
+      match_all: {},
+    },
+    size: entriesPerPage,
+    from: from,
+  };
+
+  const searchResult = await client.search({
+    index: ES_INDEX,
+    body: query,
+  });
+
+  console.log(
+    "Full Elasticsearch response for all data:",
+    JSON.stringify(searchResult, null, 2)
+  );
+
+  const documents = searchResult.hits.hits.map((hit) => hit._source);
+
+  return {
+    success: true,
+    documents,
+  };
+};
+
 const searchResult = asyncHandler(async (req, res) => {
   try {
     const pageNumber = parseInt(req.query.pageNumber) || 1;
     const entriesPerPage = parseInt(req.query.entriesPerPage) || 50;
     const from = (pageNumber - 1) * entriesPerPage;
-    const type = req.params.type;
-    let data;
+    const type = req.query.type;
+    let data = {};
 
-    if (type === "novaGroup") {
+    // Handling NOVA group query
+    if (type === "novaclass") {
       const novaGroup = req.body.novaclass;
       const novaGroups = novaGroup
         ? novaGroup.split(",").map((group) => group.trim())
@@ -226,25 +254,37 @@ const searchResult = asyncHandler(async (req, res) => {
       }
     }
 
+    // Handling category, brand, or product query
     if (type === "category") {
       const category = req.body.category;
       const brand = req.body.brand;
       const product = req.body.product;
 
-      data = await getResultByCategory(
-        pageNumber,
-        entriesPerPage,
-        category,
-        brand,
-        product,
-        from
-      );
+      if (!category && !brand && !product) {
+        data = await getAllData(pageNumber, entriesPerPage, from);
 
-      if (!data.success) {
-        return res.status(404).json({
-          success: false,
-          message: "No documents found for the specified category.",
-        });
+        if (!data.success) {
+          return res.status(404).json({
+            success: false,
+            message: "No documents found.",
+          });
+        }
+      } else {
+        data = await getResultByCategory(
+          pageNumber,
+          entriesPerPage,
+          category,
+          brand,
+          product,
+          from
+        );
+
+        if (!data.success) {
+          return res.status(404).json({
+            success: false,
+            message: "No documents found for the specified category.",
+          });
+        }
       }
     }
 
@@ -252,10 +292,10 @@ const searchResult = asyncHandler(async (req, res) => {
       success: true,
       data: {
         documents: data.documents,
-        category: data.category,
-        brand: data.brand,
-        product: data.product,
-        novaGroups: data.novaGroups,
+        category: data.category || null,
+        brand: data.brand || null,
+        product: data.product || null,
+        novaGroups: data.novaGroups || null,
       },
     });
   } catch (error) {
@@ -269,50 +309,3 @@ const searchResult = asyncHandler(async (req, res) => {
 });
 
 export { searchCategories, searchResult };
-
-// const apiCall = (page, limit) => {
-//     setLoading(true);
-
-//     // Create form data in URL-encoded format
-//     const formData = new URLSearchParams();
-//     formData.append("novaclass", novaclass);
-
-//     axios
-//       .post(
-//         `http://localhost:8000/api/v1/search/search-result?type=${}pageNumber=${page}&entriesPerPage=${limit}`,
-//         formData,
-//         {
-//           headers: {
-//             "Content-Type": "application/x-www-form-urlencoded",
-//           },
-//         }
-//       )
-//       .then((res) => {
-//         const apiData = res.data.data.documents;
-//         setData(apiData || []);
-//         console.log("WTF", apiData);
-//         let tableData = [];
-//         apiData.map((data) => {
-//           let obj = {
-//             _id: data?._id,
-//             product_name: data?.product_name,
-//             generic_name: data?.generic_name,
-//             quantity: data?.product_quantity,
-//             categories_en: data?.categories_en,
-//             nutriscore_grade: data?.nutriscore_grade,
-//             ecoscore_score: data?.ecoscore_score,
-//             serving_size: data?.serving_size,
-//             novaClass: data?.nova_group,
-//           };
-//           tableData.push(obj);
-//         });
-
-//         setData(tableData);
-//         setTableParams((prev) => ({
-//           ...prev,
-//           total: res.data.data.totalCount,
-//         }));
-//         setLoading(false);
-//       })
-//       .catch(() => setLoading(false));
-//   };
