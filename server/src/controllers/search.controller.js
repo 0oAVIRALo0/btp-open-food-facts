@@ -6,7 +6,7 @@ import { Client } from "@elastic/elasticsearch";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import fs from "fs";
 
-const ES_INDEX = "open-food-facts-dataset-2024.10.16";
+const ES_INDEX = "dataset";
 
 const client = new Client({
   node: process.env.ES_NODE,
@@ -78,60 +78,184 @@ const searchCategories = asyncHandler(async (req, res) => {
   }
 });
 
-const searchNovaGroups = asyncHandler(async (req, res) => {
+const getResultByNovaGroup = async (
+  pageNumber,
+  entriesPerPage,
+  novaGroups,
+  from
+) => {
+  const query = {
+    query: {
+      bool: {
+        must:
+          novaGroups.length > 0
+            ? [
+                {
+                  terms: {
+                    nova_group: novaGroups,
+                  },
+                },
+              ]
+            : [],
+      },
+    },
+    size: entriesPerPage,
+    from: from,
+  };
+
+  const searchResult = await client.search({
+    index: ES_INDEX,
+    body: query,
+  });
+
+  console.log(
+    "Full Elasticsearch response for nova groups:",
+    JSON.stringify(searchResult, null, 2)
+  );
+
+  const documents = searchResult.hits.hits.map((hit) => hit._source);
+
+  if (documents.length === 0) {
+    return {
+      success: false,
+      message: "No documents found for the specified NOVA group(s).",
+    };
+  }
+
+  return {
+    success: true,
+    documents,
+    novaGroups,
+  };
+};
+
+const getResultByCategory = async (
+  pageNumber,
+  entriesPerPage,
+  category,
+  brand,
+  product,
+  from
+) => {
+  const query = {
+    query: {
+      bool: {
+        must: [
+          {
+            match: {
+              categories_en: category,
+            },
+          },
+        ],
+      },
+    },
+    size: entriesPerPage,
+    from: from,
+  };
+
+  if (brand) {
+    query.query.bool.must.push({
+      match: {
+        brands_tags: brand,
+      },
+    });
+  }
+
+  if (product) {
+    query.query.bool.must.push({
+      match: {
+        product_name: product,
+      },
+    });
+  }
+
+  const searchResult = await client.search({
+    index: ES_INDEX,
+    body: query,
+  });
+
+  console.log(
+    "Full Elasticsearch response for categories:",
+    JSON.stringify(searchResult, null, 2)
+  );
+
+  const documents = searchResult.hits.hits.map((hit) => hit._source);
+
+  if (documents.length === 0) {
+    return {
+      success: false,
+      message: "No documents found for the specified category.",
+    };
+  }
+
+  return {
+    success: true,
+    documents,
+    category,
+    brand,
+    product,
+  };
+};
+
+const searchResult = asyncHandler(async (req, res) => {
   try {
     const pageNumber = parseInt(req.query.pageNumber) || 1;
     const entriesPerPage = parseInt(req.query.entriesPerPage) || 50;
     const from = (pageNumber - 1) * entriesPerPage;
+    const type = req.params.type;
+    let data;
 
-    const novaGroup = req.query.novaGroup;
-    console.log("novaGroup:", novaGroup);
-    const novaGroups = novaGroup ? novaGroup.split(",").map(Number) : [];
-    console.log("novaGroups:", novaGroups);
+    if (type === "novaGroup") {
+      const novaGroup = req.body.novaclass;
+      const novaGroups = novaGroup
+        ? novaGroup.split(",").map((group) => group.trim())
+        : [];
 
-    const query = {
-      query: {
-        bool: {
-          must:
-            novaGroups.length > 0
-              ? [
-                  {
-                    terms: {
-                      nova_group: novaGroups,
-                    },
-                  },
-                ]
-              : [],
-        },
-      },
-      size: entriesPerPage,
-      from: from,
-    };
+      data = await getResultByNovaGroup(
+        pageNumber,
+        entriesPerPage,
+        novaGroups,
+        from
+      );
 
-    const searchResult = await client.search({
-      index: ES_INDEX,
-      body: query,
-    });
+      if (!data.success) {
+        return res.status(404).json({
+          success: false,
+          message: "No documents found for the specified NOVA group(s).",
+        });
+      }
+    }
 
-    console.log(
-      "Full Elasticsearch response for nova groups:",
-      JSON.stringify(searchResult, null, 2)
-    );
+    if (type === "category") {
+      const category = req.body.category;
+      const brand = req.body.brand;
+      const product = req.body.product;
 
-    const documents = searchResult.hits.hits.map((hit) => hit._source);
+      data = await getResultByCategory(
+        pageNumber,
+        entriesPerPage,
+        category,
+        brand,
+        product,
+        from
+      );
 
-    if (documents.length === 0) {
-      return res.status(404).json({
-        success: false,
-        message: "No documents found for the specified NOVA group(s).",
-      });
+      if (!data.success) {
+        return res.status(404).json({
+          success: false,
+          message: "No documents found for the specified category.",
+        });
+      }
     }
 
     res.status(200).json({
       success: true,
       data: {
-        documents,
-        totalCount: documents.length,
+        documents: data.documents,
+        category: data.category,
+        brand: data.brand,
+        product: data.product,
+        novaGroups: data.novaGroups,
       },
     });
   } catch (error) {
@@ -139,49 +263,56 @@ const searchNovaGroups = asyncHandler(async (req, res) => {
     res.status(500).json({
       success: false,
       message:
-        "An error occurred while querying Elasticsearch for NOVA groups.",
+        "An error occurred while querying Elasticsearch for the specified type.",
     });
   }
 });
 
-const searchAll = asyncHandler(async (req, res) => {
-  try {
-    const pageNumber = parseInt(req.query.pageNumber) || 1;
-    const entriesPerPage = parseInt(req.query.entriesPerPage) || 50;
-    const from = (pageNumber - 1) * entriesPerPage;
+export { searchCategories, searchResult };
 
-    const searchResult = await client.search({
-      index: ES_INDEX,
-      size: entriesPerPage,
-      from: from,
-      body: {
-        query: {
-          match_all: {},
-        },
-      },
-    });
+// const apiCall = (page, limit) => {
+//     setLoading(true);
 
-    console.log(
-      "Full Elasticsearch response for documents:",
-      JSON.stringify(searchResult, null, 2)
-    );
+//     // Create form data in URL-encoded format
+//     const formData = new URLSearchParams();
+//     formData.append("novaclass", novaclass);
 
-    // Extract the documents for the current page
-    const documents = searchResult.hits.hits.map((hit) => hit._source);
+//     axios
+//       .post(
+//         `http://localhost:8000/api/v1/search/search-result?type=${}pageNumber=${page}&entriesPerPage=${limit}`,
+//         formData,
+//         {
+//           headers: {
+//             "Content-Type": "application/x-www-form-urlencoded",
+//           },
+//         }
+//       )
+//       .then((res) => {
+//         const apiData = res.data.data.documents;
+//         setData(apiData || []);
+//         console.log("WTF", apiData);
+//         let tableData = [];
+//         apiData.map((data) => {
+//           let obj = {
+//             _id: data?._id,
+//             product_name: data?.product_name,
+//             generic_name: data?.generic_name,
+//             quantity: data?.product_quantity,
+//             categories_en: data?.categories_en,
+//             nutriscore_grade: data?.nutriscore_grade,
+//             ecoscore_score: data?.ecoscore_score,
+//             serving_size: data?.serving_size,
+//             novaClass: data?.nova_group,
+//           };
+//           tableData.push(obj);
+//         });
 
-    res.status(200).json({
-      success: true,
-      data: {
-        documents: documents,
-      },
-    });
-  } catch (error) {
-    console.error("Elasticsearch query error:", error);
-    res.status(500).json({
-      success: false,
-      message: "An error occurred while querying Elasticsearch",
-    });
-  }
-});
-
-export { searchCategories, searchNovaGroups, searchAll };
+//         setData(tableData);
+//         setTableParams((prev) => ({
+//           ...prev,
+//           total: res.data.data.totalCount,
+//         }));
+//         setLoading(false);
+//       })
+//       .catch(() => setLoading(false));
+//   };

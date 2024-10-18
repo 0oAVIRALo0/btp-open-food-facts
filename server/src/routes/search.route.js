@@ -1,14 +1,12 @@
 import { Router } from "express";
 import {
   searchCategories,
-  searchNovaGroups,
-  searchAll,
+  searchResult,
 } from "../controllers/search.controller.js";
 
 const router = Router();
 
 router.route("/categories").get(searchCategories);
-router.route("/nova-groups").get(searchNovaGroups);
-router.route("/all").get(searchAll);
+router.route("/search-result").post(searchResult);
 
 export default router;
