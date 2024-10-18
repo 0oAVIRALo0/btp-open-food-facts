@@ -224,6 +224,80 @@ const getAllData = async (pageNumber, entriesPerPage, from) => {
   };
 };
 
+const getResultByCategoryBrandProduct = async (
+  pageNumber,
+  entriesPerPage,
+  category,
+  brand,
+  product,
+  from
+) => {
+  const mustQueries = [];
+
+  // Add conditions to the query if category, brand, or product is provided
+  if (category) {
+    mustQueries.push({
+      match: {
+        categories_en: category,
+      },
+    });
+  }
+
+  if (brand) {
+    mustQueries.push({
+      match: {
+        brands_tags: brand,
+      },
+    });
+  }
+
+  if (product) {
+    mustQueries.push({
+      match: {
+        product_name: product,
+      },
+    });
+  }
+
+  // Construct the Elasticsearch query
+  const query = {
+    query: {
+      bool: {
+        must: mustQueries,
+      },
+    },
+    size: entriesPerPage,
+    from: from,
+  };
+
+  const searchResult = await client.search({
+    index: ES_INDEX,
+    body: query,
+  });
+
+  console.log(
+    "Full Elasticsearch response for category/brand/product:",
+    JSON.stringify(searchResult, null, 2)
+  );
+
+  const documents = searchResult.hits.hits.map((hit) => hit._source);
+
+  if (documents.length === 0) {
+    return {
+      success: false,
+      message: "No documents found for the specified query.",
+    };
+  }
+
+  return {
+    success: true,
+    documents,
+    category,
+    brand,
+    product,
+  };
+};
+
 const searchResult = asyncHandler(async (req, res) => {
   try {
     const pageNumber = parseInt(req.query.pageNumber) || 1;
@@ -270,7 +344,8 @@ const searchResult = asyncHandler(async (req, res) => {
           });
         }
       } else {
-        data = await getResultByCategory(
+        // Use the dynamic query function to handle partial or full inputs
+        data = await getResultByCategoryBrandProduct(
           pageNumber,
           entriesPerPage,
           category,
@@ -282,7 +357,7 @@ const searchResult = asyncHandler(async (req, res) => {
         if (!data.success) {
           return res.status(404).json({
             success: false,
-            message: "No documents found for the specified category.",
+            message: "No documents found for the specified query.",
           });
         }
       }
