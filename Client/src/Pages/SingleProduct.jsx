@@ -1,16 +1,13 @@
 import React, { useState, useEffect } from "react";
-import {useHistory ,useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import axios from "axios";
 
 import { Table } from "antd";
 
-function SearchResult() {
+
+function SingleProduct() {
   const [searchParams] = useSearchParams();
-  const type = searchParams.get("type");
-  const novaclass = searchParams.get("novaclass")?.split(",").map(Number) || [];
-  const categoryName = searchParams.get("categoryName");
-  const brandName = searchParams.get("brandName");
-  const productName = searchParams.get("productName");
+  const id = searchParams.get('id')
 
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -19,19 +16,13 @@ function SearchResult() {
     limit: 10,
     total: 0,
   });
+
   const apiCall = (page, limit) => {
     setLoading(true);
 
-    const formData = new URLSearchParams();
-    formData.append("novaclass", novaclass);
-    formData.append("categoryName", categoryName || "");
-    formData.append("brandName", brandName || "");
-    formData.append("productName", productName || "");
-
     axios
-      .post(
-        `http://localhost:8000/api/v1/search/search-result?type=${type}&pageNumber=${page}&entriesPerPage=${limit}`,
-        formData,
+      .get(
+        `http://localhost:8000/api/v1/search/document/${id}?pageNumber=${page}&entriesPerPage=${limit}`,
         {
           headers: {
             "Content-Type": "application/x-www-form-urlencoded",
@@ -39,7 +30,6 @@ function SearchResult() {
         }
       )
       .then((res) => {
-        // console.log(res.data.data.documents);
         const apiData = res.data.data.documents;
         setData(apiData || []);
         console.log("WTF", apiData);
@@ -72,8 +62,10 @@ function SearchResult() {
   useEffect(() => {
     apiCall(tableParams.page, tableParams.limit);
   }, [tableParams.page, tableParams.limit]);
-  
-  const history = useHistory(); 
+
+  const handlePageChange = (page, limit) => {
+    setTableParams({ ...tableParams, page, limit });
+  };
 
   const columns = [
     {
@@ -81,28 +73,18 @@ function SearchResult() {
       dataIndex: "product_name",
       key: "product_name",
       fixed: "left",
+      render: (text) => (
+        <span
+          style={{
+            color: "#638773",
+            display: "flex",
+            justifyContent: "center",
+          }}
+        >
+          {text || "-"}
+        </span>
+      ),
       width: "200px",
-      render: (text, record) => {
-        const handleClick = () => {
-          if (record?.id) {
-            history.push(`/view-more-details?id=${record.code}`);
-          }
-        };
-  
-        return (
-          <span
-            onClick={handleClick}
-            style={{
-              color: "#638773",
-              display: "flex",
-              justifyContent: "center",
-              cursor: "pointer", 
-            }}
-          >
-            {text || "-"}
-          </span>
-        );
-      },
     },
     {
       title: "Genric Name",
@@ -217,10 +199,6 @@ function SearchResult() {
     },
   ];
 
-  const handlePageChange = (page, limit) => {
-    setTableParams({ ...tableParams, page, limit });
-  };
-
   return (
     <div className="searcResult-wrapper">
       <div className="container">
@@ -243,7 +221,7 @@ function SearchResult() {
         />
       </div>
     </div>
-  );
+  )
 }
 
-export default SearchResult;
+export default SingleProduct

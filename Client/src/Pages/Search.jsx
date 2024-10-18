@@ -1,7 +1,6 @@
 import React, {useState, useEffect} from 'react'
 
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 
 import {
   Box,
@@ -17,7 +16,6 @@ import {
   InputLabel,
   TextField,
 } from "@mui/material";
-
 
 function Search() {
   const [value, setValue] = useState(0);
