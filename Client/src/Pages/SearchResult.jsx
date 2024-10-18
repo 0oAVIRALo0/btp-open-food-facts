@@ -21,9 +21,8 @@ function SearchResult() {
     setLoading(true);
     axios
       .post(
-        `https://cosylab.iiitd.edu.in/food-processing-db-api/search?page=${page}&pageSize=${limit}`,
+        `https://cosylab.iiitd.edu.in/food-processing-db-api/search?page=${page}&pageSize=${limit}&type=${type}`,
         {
-          type: type,
           novaclass,
         }
       )
