@@ -4,10 +4,9 @@ import axios from "axios";
 
 import { Table } from "antd";
 
-
 function SingleProduct() {
   const [searchParams] = useSearchParams();
-  const id = searchParams.get('id')
+  const id = searchParams.get("id");
 
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -221,7 +220,7 @@ function SingleProduct() {
         />
       </div>
     </div>
-  )
+  );
 }
 
-export default SingleProduct
+export default SingleProduct;

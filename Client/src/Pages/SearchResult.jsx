@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {useHistory ,useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import axios from "axios";
 
 import { Table } from "antd";
@@ -72,8 +72,6 @@ function SearchResult() {
   useEffect(() => {
     apiCall(tableParams.page, tableParams.limit);
   }, [tableParams.page, tableParams.limit]);
-  
-  const history = useHistory(); 
 
   const columns = [
     {
@@ -81,28 +79,18 @@ function SearchResult() {
       dataIndex: "product_name",
       key: "product_name",
       fixed: "left",
+      render: (text) => (
+        <span
+          style={{
+            color: "#638773",
+            display: "flex",
+            justifyContent: "center",
+          }}
+        >
+          {text || "-"}
+        </span>
+      ),
       width: "200px",
-      render: (text, record) => {
-        const handleClick = () => {
-          if (record?.id) {
-            history.push(`/view-more-details?id=${record.code}`);
-          }
-        };
-  
-        return (
-          <span
-            onClick={handleClick}
-            style={{
-              color: "#638773",
-              display: "flex",
-              justifyContent: "center",
-              cursor: "pointer", 
-            }}
-          >
-            {text || "-"}
-          </span>
-        );
-      },
     },
     {
       title: "Genric Name",

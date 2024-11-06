@@ -6,10 +6,13 @@ import { Client } from "@elastic/elasticsearch";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import fs from "fs";
 
-const ES_INDEX = "dataset";
+const ES_INDEX = "open-food-facts-dataset";
+let maxLength = 0;
 
 const client = new Client({
   node: process.env.ES_NODE,
+  requestTimeout: 1200000, 
+  maxRetries: 3,
   auth: {
     username: process.env.USERNAME,
     password: process.env.PASSWORD,
@@ -23,61 +26,6 @@ const client = new Client({
   },
 });
 
-const searchCategories = asyncHandler(async (req, res) => {
-  try {
-    const pageNumber = parseInt(req.query.pageNumber) || 1;
-    const entriesPerPage = parseInt(req.query.entriesPerPage) || 50;
-    const from = (pageNumber - 1) * entriesPerPage;
-
-    // fetch the specific entries for the requested page
-    const searchResult = await client.search({
-      index: ES_INDEX,
-      size: entriesPerPage,
-      from: from,
-      body: {
-        query: {
-          match_all: {},
-        },
-      },
-    });
-
-    console.log(
-      "Full Elasticsearch response for documents:",
-      JSON.stringify(searchResult, null, 2)
-    );
-
-    // Extract the documents for the current page
-    const documents = searchResult.hits.hits.map((hit) => hit._source);
-
-    // Now, get unique categories from the documents for this page
-    const uniqueCategoriesSet = new Set();
-    documents.forEach((doc) => {
-      if (Array.isArray(doc.categories_en)) {
-        doc.categories_en.forEach((category) =>
-          uniqueCategoriesSet.add(category.trim())
-        );
-      } else {
-        uniqueCategoriesSet.add(doc.categories_en.trim());
-      }
-    });
-
-    const uniqueCategories = Array.from(uniqueCategoriesSet);
-
-    res.status(200).json({
-      success: true,
-      data: {
-        uniqueCategories,
-      },
-    });
-  } catch (error) {
-    console.error("Elasticsearch query error:", error);
-    res.status(500).json({
-      success: false,
-      message: "An error occurred while querying Elasticsearch",
-    });
-  }
-});
-
 const getResultByNovaGroup = async (
   pageNumber,
   entriesPerPage,
@@ -85,6 +33,7 @@ const getResultByNovaGroup = async (
   from
 ) => {
   const startTime = new Date();
+
   const query = {
     query: {
       bool: {
@@ -109,8 +58,8 @@ const getResultByNovaGroup = async (
     body: query,
   });
 
-  const endTime = new Date(); // End time
-  const timeTaken = endTime - startTime; // Time in milliseconds
+  const endTime = new Date(); 
+  const timeTaken = endTime - startTime; 
 
   console.log(
     "Full Elasticsearch response for nova groups:",
@@ -120,8 +69,8 @@ const getResultByNovaGroup = async (
 
   const documents = searchResult.hits.hits.map((hit) => hit._source);
   console.log("Documents:", documents.length);
-  const maxLength = 10000 - from;
 
+  // If no documents found, return a failure response
   if (documents.length === 0) {
     return {
       success: false,
@@ -129,83 +78,57 @@ const getResultByNovaGroup = async (
     };
   }
 
+  let maxLength;
+
+  if (novaGroups.length === 1) {
+    const countResult = await client.count({
+      index: ES_INDEX,
+      body: {
+        query: {
+          terms: {
+            nova_group: novaGroups,
+          },
+        },
+      },
+    });
+    maxLength = countResult.count;
+    console.log("Max Length:", maxLength);
+  } else {
+    const groupCounts = [];
+
+    for (const group of novaGroups) {
+      const countResult = await client.count({
+        index: ES_INDEX,
+        body: {
+          query: {
+            term: {
+              nova_group: group,
+            },
+          },
+        },
+      });
+      groupCounts.push({ group, count: countResult.count });
+    }
+
+    // Find the group with the highest count
+    maxLength = Math.max(...groupCounts.map((group) => group.count));
+    console.log("Max Length:", maxLength);
+  }
+
   return {
     success: true,
     documents,
-    maxLength,
+    maxLength: maxLength - from,
     novaGroups,
   };
 };
 
-const getResultByCategory = async (
-  pageNumber,
-  entriesPerPage,
-  category,
-  brand,
-  product,
-  from
-) => {
-  const query = {
-    query: {
-      bool: {
-        must: [
-          {
-            match: {
-              categories_en: category,
-            },
-          },
-        ],
-      },
-    },
-    size: entriesPerPage,
-    from: from,
-  };
+const getUniqueCategories = asyncHandler(async (req, res) => {
+  const entriesPerPage = 100;
+  let from = 0;
 
-  if (brand) {
-    query.query.bool.must.push({
-      match: {
-        brands_tags: brand,
-      },
-    });
-  }
+  let uniqueCategories = new Set();
 
-  if (product) {
-    query.query.bool.must.push({
-      match: {
-        product_name: product,
-      },
-    });
-  }
-
-  const searchResult = await client.search({
-    index: ES_INDEX,
-    body: query,
-  });
-
-  console.log(
-    "Full Elasticsearch response for categories:",
-    JSON.stringify(searchResult, null, 2)
-  );
-
-  const documents = searchResult.hits.hits.map((hit) => hit._source);
-
-  if (documents.length === 0) {
-    return {
-      success: false,
-      message: "No documents found for the specified category.",
-    };
-  }
-
-  return {
-    success: true,
-    documents,
-    category,
-    brand,
-    product,
-  };
-};
-
-const getAllData = async (pageNumber, entriesPerPage, from) => {
   const query = {
     query: {
       match_all: {},
@@ -219,18 +142,155 @@ const getAllData = async (pageNumber, entriesPerPage, from) => {
     body: query,
   });
 
+  searchResult.hits.hits.forEach((hit) => {
+    const categories = hit._source.categories_en;
+
+    if (categories) {
+      Array.isArray(categories)
+        ? categories.forEach((category) => uniqueCategories.add(category))
+        : uniqueCategories.add(categories);
+    }
+  });
+
+  from += entriesPerPage;
+
+  const resultCategories = [...uniqueCategories];
+
+  console.log("Unique Categories:", resultCategories);
+
+  console.log("Number of unique categories:", resultCategories.length);
+
+  res.status(200).json({
+    success: true,
+    data: {
+      categories: resultCategories,
+    },
+  });
+});
+
+const getUniqueBrands = asyncHandler(async (req, res) => {
+  const entriesPerPage = 100;
+  let from = 0;
+
+  let uniqueBrands = new Set();
+
+  const query = {
+    query: {
+      match_all: {},
+    },
+    size: entriesPerPage,
+    from: from,
+  };
+
+  const searchResult = await client.search({
+    index: ES_INDEX,
+    body: query,
+  });
+
+  searchResult.hits.hits.forEach((hit) => {
+    const brands = hit._source.brands;
+    if (brands) {
+      Array.isArray(brands)
+        ? brands.forEach((brand) => uniqueBrands.add(brand))
+        : uniqueBrands.add(brands);
+    }
+  });
+
+  from += entriesPerPage;
+  const resultBrands = [...uniqueBrands];
+
+  console.log("Unique Brands:", resultBrands);
+
+  console.log("Number of unique brands:", resultBrands.length);
+
+  res.status(200).json({
+    success: true,
+    data: {
+      brands: resultBrands,
+    },
+  });
+});
+
+const getUniqueProductNames = asyncHandler(async (req, res) => {
+  const entriesPerPage = 100;
+  let from = 0;
+
+  let uniqueProductNames = new Set();
+
+  const query = {
+    query: {
+      match_all: {},
+    },
+    size: entriesPerPage,
+    from: from,
+  };
+
+  const searchResult = await client.search({
+    index: ES_INDEX,
+    body: query,
+  });
+
+  searchResult.hits.hits.forEach((hit) => {
+    const productName = hit._source.product_name;
+
+    if (productName) {
+      uniqueProductNames.add(productName);
+    }
+  });
+
+  from += entriesPerPage;
+
+  const resultProductNames = [...uniqueProductNames];
+
+  console.log("Unique Product Names:", resultProductNames);
+
+  console.log("Number of unique product names:", resultProductNames.length);
+
+  res.status(200).json({
+    success: true,
+    data: {
+      productNames: resultProductNames,
+    },
+  });
+});
+
+const getAllData = async (pageNumber, entriesPerPage, from) => {
+  const countQuery = {
+    query: {
+      match_all: {},
+    },
+  };
+
+  const countResult = await client.count({
+    index: ES_INDEX,
+    body: countQuery,
+  });
+
+  const maxLength = countResult.count;
+  console.log("Max Length:", maxLength);
+
+  const searchQuery = {
+    query: {
+      match_all: {},
+    },
+    size: entriesPerPage,
+    from: from,
+  };
+
+  const searchResult = await client.search({
+    index: ES_INDEX,
+    body: searchQuery,
+  });
+
   console.log(
     "Full Elasticsearch response for all data:",
     JSON.stringify(searchResult, null, 2)
   );
 
-  const documents = searchResult.hits.hits.map((hit) => hit._source);
-  const maxLength = 10000 - from;
-
   return {
     success: true,
-    documents,
-    maxLength,
+    documents: searchResult.hits.hits.map((hit) => hit._source),
+    maxLength: maxLength - from,
   };
 };
 
@@ -269,8 +329,22 @@ const getResultByCategoryBrandProduct = async (
     });
   }
 
-  // Construct the Elasticsearch query
-  const query = {
+  if (mustQueries.length === 0) {
+    return {
+      success: false,
+      message: "At least one of category, brand, or product must be provided.",
+    };
+  }
+
+  const countQuery = {
+    query: {
+      bool: {
+        must: mustQueries,
+      },
+    },
+  };
+
+  const searchQuery = {
     query: {
       bool: {
         must: mustQueries,
@@ -280,9 +354,17 @@ const getResultByCategoryBrandProduct = async (
     from: from,
   };
 
+  const countResult = await client.count({
+    index: ES_INDEX,
+    body: countQuery,
+  });
+
+  const maxLength = countResult.count;
+  console.log("Max Length:", maxLength);
+
   const searchResult = await client.search({
     index: ES_INDEX,
-    body: query,
+    body: searchQuery,
   });
 
   console.log(
@@ -291,7 +373,6 @@ const getResultByCategoryBrandProduct = async (
   );
 
   const documents = searchResult.hits.hits.map((hit) => hit._source);
-  const maxLength = 10000 - from;
 
   if (documents.length === 0) {
     return {
@@ -303,12 +384,13 @@ const getResultByCategoryBrandProduct = async (
   return {
     success: true,
     documents,
-    maxLength,
+    maxLength: maxLength - from,
     category,
     brand,
     product,
   };
 };
+
 
 const getDocumentById = asyncHandler(async (req, res) => {
   try {
@@ -347,10 +429,111 @@ const getDocumentById = asyncHandler(async (req, res) => {
   }
 });
 
+// Fetch brand names if category is provided
+const getBrandNameByCategory = asyncHandler(async (req, res) => {
+  const entriesPerPage = 100;
+  let from = 0;
+  const category = req.body.categoryName;
+
+  // Set to collect unique brand names
+  const brands = new Set();
+
+  const query = {
+    query: {
+      match: {
+        categories_en: category,
+      },
+    },
+    size: entriesPerPage,
+    from: from,
+  };
+
+  const searchResult = await client.search({
+    index: ES_INDEX,
+    body: query,
+  });
+
+  // Log the search result for debugging if needed
+  console.log("Search Result:", JSON.stringify(searchResult, null, 2));
+
+  // Extract and add brand names to the Set
+  searchResult.hits.hits.forEach((hit) => {
+    const brandName = hit._source.brands;
+    if (brandName) {
+      Array.isArray(brandName)
+        ? brandName.forEach((brand) => brands.add(brand))
+        : brands.add(brandName);
+    }
+  });
+
+  // Update `from` to fetch the next batch
+  from += entriesPerPage;
+
+  // Convert the Set to an array for the response
+  const resultBrands = [...brands];
+
+  res.status(200).json({
+    success: true,
+    data: resultBrands,
+  });
+});
+
+// Fetch product name if category and brand is provided
+const getProductNameByCategoryBrand = asyncHandler(async (req, res) => {
+  const entriesPerPage = 100;
+  let from = 0;
+  const category = req.body.categoryName;
+  const brand = req.body.brandName;
+  // Set to collect unique brand names
+  const products = new Set();
+
+  const query = {
+    query: {
+      bool: {
+        must: [
+          { match: { categories_en: category } },
+          { match: { brands: brand } },
+        ],
+      },
+    },
+    size: entriesPerPage,
+    from: from,
+  };
+
+  const searchResult = await client.search({
+    index: ES_INDEX,
+    body: query,
+  });
+
+  // Log the search result for debugging if needed
+  console.log("Search Result:", JSON.stringify(searchResult, null, 2));
+
+  // Extract and add brand names to the Set
+  searchResult.hits.hits.forEach((hit) => {
+    const productName = hit._source.product_name;
+    if (productName) {
+      Array.isArray(productName)
+        ? productName.forEach((product) => products.add(product))
+        : products.add(productName);
+    }
+  });
+
+  // Update `from` to fetch the next batch
+  from += entriesPerPage;
+
+  // Convert the Set to an array for the response
+  const resultProducts = [...products];
+
+  res.status(200).json({
+    success: true,
+    data: resultProducts,
+  });
+});
+
 const searchResult = asyncHandler(async (req, res) => {
   try {
     const pageNumber = parseInt(req.query.pageNumber) || 1;
-    const entriesPerPage = parseInt(req.query.entriesPerPage) || 50;
+    const entriesPerPage = parseInt(req.query.entriesPerPage) || 10;
     const from = (pageNumber - 1) * entriesPerPage;
     const type = req.query.type;
     let data = {};
@@ -361,6 +544,8 @@ const searchResult = asyncHandler(async (req, res) => {
       const novaGroups = novaGroup
         ? novaGroup.split(",").map((group) => group.trim())
         : [];
+
+      console.log("Nova Groups:", novaGroups);
 
       data = await getResultByNovaGroup(
         pageNumber,
@@ -380,12 +565,12 @@ const searchResult = asyncHandler(async (req, res) => {
     // Handling category, brand, or product query
     if (type === "category") {
       const category = req.body.categoryName;
-      console.log("Category:", category);
       const brand = req.body.brandName;
       const product = req.body.productName;
 
       if (!category && !brand && !product) {
         data = await getAllData(pageNumber, entriesPerPage, from);
+        console.log("Max Length:", data.maxLength);
 
         if (!data.success) {
           return res.status(404).json({
@@ -434,22 +619,4 @@ const searchResult = asyncHandler(async (req, res) => {
   }
 });
 
-export { searchCategories, searchResult, getDocumentById };
-
-// const query = {
-//   query: {
-//     bool: {
-//       must:
-//         novaGroups.length > 0
-//           ? [
-//               {
-//                 terms: {
-//                   nova_group: novaGroups,
-//                 },
-//               },
-//             ]
-//           : [],
-//     },
-//   },
-//   // Removed size and from
-// };
+export { searchResult, getDocumentById, getBrandNameByCategory, getProductNameByCategoryBrand, getUniqueCategories, getUniqueBrands, getUniqueProductNames };
