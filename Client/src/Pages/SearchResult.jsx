@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {useHistory ,useSearchParams } from "react-router-dom";
+import {useSearchParams } from "react-router-dom";
 import axios from "axios";
 
 import { Table } from "antd";
@@ -73,7 +73,7 @@ function SearchResult() {
     apiCall(tableParams.page, tableParams.limit);
   }, [tableParams.page, tableParams.limit]);
   
-  const history = useHistory(); 
+  // const history = useHistory(); 
 
   const columns = [
     {
@@ -83,15 +83,15 @@ function SearchResult() {
       fixed: "left",
       width: "200px",
       render: (text, record) => {
-        const handleClick = () => {
-          if (record?.id) {
-            history.push(`/view-more-details?id=${record.code}`);
-          }
-        };
+        // const handleClick = () => {
+        //   if (record?.id) {
+        //     history.push(`/view-more-details?id=${record.code}`);
+        //   }
+        // };
   
         return (
           <span
-            onClick={handleClick}
+            // onClick={handleClick}
             style={{
               color: "#638773",
               display: "flex",
