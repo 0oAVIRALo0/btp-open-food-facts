@@ -18,7 +18,7 @@ function SingleProduct() {
 
   const apiCall = (page, limit) => {
     setLoading(true);
-
+    console.log("WTF", id);
     axios
       .get(
         `http://localhost:8000/api/v1/search/document/${id}?pageNumber=${page}&entriesPerPage=${limit}`,

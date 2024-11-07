@@ -1,4 +1,5 @@
-import React, {useState, useEffect} from 'react'
+import React, { useState, useEffect } from 'react'
+import axios from 'axios'
 
 import { useNavigate } from "react-router-dom";
 
@@ -15,6 +16,8 @@ import {
   FormHelperText,
   InputLabel,
   TextField,
+  Autocomplete,
+  ListSubheader,
 } from "@mui/material";
 
 function Search() {
@@ -23,6 +26,10 @@ function Search() {
   const [categoryName, setCategoryName] = useState("");
   const [brandName, setBrandName] = useState("");
   const [productName, setProductName] = useState("");
+
+  const [categories, setCategories] = useState([]);
+  const [brands, setBrands] = useState([]);
+  const [products, setProducts] = useState([]);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -34,6 +41,48 @@ function Search() {
     novaClass3: false,
     novaClass4: false,
   });
+
+  const getCategories = () => {
+    // Api call to get categories
+    axios.get("http://localhost:8000/api/v1/search/unique-categories")
+    .then((res) => {
+      console.log(res.data.data.categories);
+      setCategories((prev) => [...prev, ...res.data.data.categories]);
+    })
+    .catch((err) => {
+      console.log(err);
+    })
+  }
+
+  const getBrands = () => {
+    // Api call to get brands
+    axios.get("http://localhost:8000/api/v1/search/unique-brands")
+    .then((res) => {
+      console.log(res.data.data.brands);
+      setBrands((prev) => [...prev, ...res.data.data.brands]);
+    })
+    .catch((err) => {
+      console.log(err);
+    })
+  }
+
+  const getProducts = () => {
+    // Api call to get products
+    axios.get("http://localhost:8000/api/v1/search/unique-product-names")
+    .then((res) => {
+      console.log(res.data.data.productNames);
+      setProducts((prev) => [...prev, ...res.data.data.productNames]);
+    })
+    .catch((err) => {
+      console.log(err);
+    }) 
+  }
+
+  useEffect(() => {
+    getCategories();
+    getBrands();
+    getProducts();
+  }, []);
 
   const handleChangeNovaClass = (event) => {
     setState({
@@ -71,6 +120,45 @@ function Search() {
       `/search-result?type=${type}&novaclass=${novaclass}&categoryName=${categoryName}&brandName=${brandName}&productName=${productName}`
     );
   };
+
+  const [catOptions, setCatOptions] = useState([...categories]);
+
+  const handleShowMoreCategories = () => {
+    // Simulate loading more categories (e.g., fetch from API)
+    const moreCategories = [
+      "Category 5",
+      "Category 6",
+      "Category 7",
+      "Category 8",
+    ];
+    setCategories(prevOptions => [...prevOptions, ...moreCategories]);
+  };
+
+  const handleShowMoreBrands = () => {
+    // Simulate loading more brands (e.g., fetch from API)
+    const moreBrands = [
+      "Brand 5",
+      "Brand 6",
+      "Brand 7",
+      "Brand 8",
+    ];
+
+    setBrands(prevOptions => [...prevOptions, ...moreBrands]);
+  };
+
+  const handleShowMoreProducts = () => {
+    // Simulate loading more products (e.g., fetch from API)
+    const moreProducts = [
+      "Product 5",
+      "Product 6",
+      "Product 7",
+      "Product 8",
+    ];
+
+    setProducts(prevOptions => [...prevOptions, ...moreProducts]);
+  };
+
+  const showMoreOption = "Show More";
 
   return (
     <Container maxWidth="lg">
@@ -208,7 +296,7 @@ function Search() {
               >
                 <div className="form__wrapper">
                   <div>
-                  <InputLabel style={{color: "#e69c52",  marginBottom: "2px"}} htmlFor="input-protein">
+                    <InputLabel style={{ color: "#e69c52", marginBottom: "2px" }} htmlFor="input-category">
                       Category Name
                     </InputLabel>
                     <div
@@ -216,19 +304,67 @@ function Search() {
                         display: "flex",
                         alignItems: "center",
                         marginTop: "4px",
-                        marginBottom: "2px",
                         gap: "20px",
                       }}
                     >
                       <span>
-                        <TextField id="standard-basic" label="Category Name" variant="standard" value={categoryName} onChange={(e) => setCategoryName(e.target.value)} slotProps={{input: { style: { color: "green" }}}}/>
+                        <Autocomplete
+                          id="category-dropdown"
+                          options={categories}
+                          value={categoryName}
+                          freeSolo
+                          onChange={(e, newValue) => setCategoryName(newValue)}  // Sets value when option is selected
+                          onInputChange={(e, newInputValue) => setCategoryName(newInputValue)} // Capture changes when user types
+                          sx={{
+                            width: "200px",
+                          }}
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              label="Category Name"
+                              variant="standard"
+                              InputProps={{
+                                ...params.InputProps,
+                                style: { color: "green" },
+                              }}
+                            />
+                          )}
+                          renderOption={(props, option) => (
+                            <li {...props} key={option.id}>
+                              {option}
+                            </li>
+                          )}
+                          
+                          // Add the "Show More" button below the dropdown list
+                          ListboxComponent={(props) => (
+                            <div {...props}>
+                              {props.children}
+                              <ListSubheader>
+                                <Button
+                                  onClick={handleShowMoreCategories}
+                                  style={{
+                                    color: "blue",
+                                    fontWeight: "bold",
+                                    textTransform: "none",
+                                    width: "100%",
+                                  }}
+                                  key={showMoreOption}
+                                >
+                                  Show More
+                                </Button>
+                              </ListSubheader>
+                            </div>
+                          )}
+                        />
                       </span>
                     </div>
                   </div>
                 </div>
                 <div className="form__wrapper">
                   <div>
-                    <InputLabel style={{color: "#e69c52",  marginBottom: "2px"}} htmlFor="input-protein">Brand Name</InputLabel>
+                    <InputLabel style={{ color: "#e69c52", marginBottom: "2px" }} htmlFor="input-protein">
+                      Brand Name
+                    </InputLabel>
                     <div
                       style={{
                         display: "flex",
@@ -238,14 +374,56 @@ function Search() {
                       }}
                     >
                       <span>
-                        <TextField id="standard-basic" label="Brand Name" variant="standard" value={brandName} onChange={(e) => setBrandName(e.target.value)} slotProps={{input: { style: { color: "green" }},}}/>
+                        <Autocomplete
+                          id="brand-dropdown"
+                          options={brands}  
+                          value={brandName}       
+                          freeSolo                   
+                          onChange={(e, newValue) => setBrandName(newValue)}  // Sets value when option is selected
+                          onInputChange={(e, newInputValue) => setBrandName(newInputValue)} // Capture changes when user types
+                          sx={{
+                            width: "200px",
+                          }}
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              label="Brand Name"
+                              variant="standard"
+                              InputProps={{
+                                ...params.InputProps,
+                                style: { color: "green" }, // Apply green text color
+                              }}
+                            />
+                          )}
+
+                          // Add the "Show More" button below the dropdown list
+                          ListboxComponent={(props) => (
+                            <div {...props}>
+                              {props.children}
+                              <ListSubheader>
+                                <Button
+                                  onClick={handleShowMoreBrands}
+                                  style={{
+                                    color: "blue",
+                                    fontWeight: "bold",
+                                    textTransform: "none",
+                                    width: "100%",
+                                  }}
+                                  key={showMoreOption}
+                                >
+                                  Show More
+                                </Button>
+                              </ListSubheader>
+                            </div>
+                          )}
+                        />
                       </span>
                     </div>
                   </div>
                 </div>
                 <div className="form__wrapper">
                   <div>
-                    <InputLabel style={{color: "#e69c52", marginBottom: "2px"}} htmlFor="input-protein">
+                    <InputLabel style={{ color: "#e69c52", marginBottom: "2px" }} htmlFor="input-protein">
                       Product Name
                     </InputLabel>
                     <div
@@ -257,22 +435,54 @@ function Search() {
                       }}
                     >
                       <span>
-                        <TextField 
-                          id="standard-basic" 
-                          label="Product Name" 
-                          variant="standard"
-                          value={productName}
-                          onChange={(e) => setProductName(e.target.value)}
-                          slotProps={{
-                            input: {
-                              style: { color: "green" }, // Apply green text color
-                            },
+                        <Autocomplete
+                          id="product-dropdown"
+                          options={products}  
+                          value={productName}       
+                          freeSolo                   
+                          onChange={(e, newValue) => setProductName(newValue)}  // Sets value when option is selected
+                          onInputChange={(e, newInputValue) => setProductName(newInputValue)} // Capture changes when user types
+                          sx={{
+                            width: "200px",
                           }}
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              label="Product Name"
+                              variant="standard"
+                              InputProps={{
+                                ...params.InputProps,
+                                style: { color: "green" }, // Apply green text color
+                              }}
+                            />
+                          )}
+
+                          // Add the "Show More" button below the dropdown list
+                          ListboxComponent={(props) => (
+                            <div {...props}>
+                              {props.children}
+                              <ListSubheader>
+                                <Button
+                                  onClick={handleShowMoreProducts}
+                                  style={{
+                                    color: "blue",
+                                    fontWeight: "bold",
+                                    textTransform: "none",
+                                    width: "100%",
+                                  }}
+                                  key={showMoreOption}
+                                >
+                                  Show More
+                                </Button>
+                              </ListSubheader>
+                            </div>
+                          )}
                         />
                       </span>
                     </div>
                   </div>
                 </div>
+
               </div>
             </span>
           ) : (

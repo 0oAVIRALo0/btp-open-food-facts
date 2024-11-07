@@ -13,7 +13,7 @@ function App() {
         <Route path="/" element={<LandinPage />} />
         <Route path="/search" element={<Search />} />
         <Route path="/search-result" element={<SearchResult />} />
-        <Route path="/view-more-details" element={<SingleProduct />} />
+        <Route path="/food-product-detail" element={<SingleProduct />} />
         <Route path="/predict" element={<Predict />} />
         <Route path="/contact-us" element={<ContactUs />} />
       </Routes>

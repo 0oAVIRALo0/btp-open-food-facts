@@ -1,29 +1,28 @@
-import joblib
 import pickle
 
 # Load the model from the .joblib file
-model = joblib.load('/Users/aviralchauhan/btp/open-food-facts/server/ml/44_Nutrients/nutrients_44.joblib')
+# model = joblib.load('/Users/aviralchauhan/btp/open-food-facts/server/ml/44_Nutrients/nutrients_44.joblib')
 
-# Save the model to a .pkl file
-with open('/Users/aviralchauhan/btp/open-food-facts/server/ml/44_Nutrients/nutrients_44.pkl', 'wb') as f:
-    pickle.dump(model, f)
+# # Save the model to a .pkl file
+# with open('/Users/aviralchauhan/btp/open-food-facts/server/ml/7_Nutrients/nutrients_7.pkl', 'wb') as f:
+#     pickle.dump(model, f)
 
 
-# with open('/Users/aviralchauhan/btp/server/final_models/8_Nutrients/nutrients_8.pkl', 'rb') as f:
-#   model = pickle.load(f)
+with open('/Users/aviralchauhan/btp/open-food-facts/server/ml/7_Nutrients/nutrients_7.pkl', 'rb') as f:
+  model = pickle.load(f)
 
 # Example input data (replace with actual data)
-# sample_input = [[53.2,11.7,8.2,1.08,0.5,9.6,561.0,1.3]]  # Adjust this according to your model's expected input format
+sample_input = [[53.2,11.7,8.2,1.08,0.5,9.6,561.0,1.3]]  # Adjust this according to your model's expected input format
 
 # # Use the model to make predictions
-# predictions = model.predict(sample_input)
+predictions = model.predict(sample_input)
 
 # # Print the predictions
-# print(f"Classification: {float(predictions)}")
+print(f"Classification: {float(predictions)}")
 
 
 # from sklearn.preprocessing import StandardScaler
-# import numpy as np
+# import numpy as npm
 
 # # Example dataset
 # data = np.array([[1.0, 2.0, 3.0],

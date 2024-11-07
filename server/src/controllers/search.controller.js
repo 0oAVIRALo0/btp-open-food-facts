@@ -26,7 +26,7 @@ const client = new Client({
   },
 });
 
-const getResultByNovaGroup = async (
+const getResultByNovaGroup = async (  
   pageNumber,
   entriesPerPage,
   novaGroups,
