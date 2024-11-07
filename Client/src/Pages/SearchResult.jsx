@@ -48,13 +48,12 @@ function SearchResult() {
           let obj = {
             _id: data?._id,
             product_name: data?.product_name,
-            generic_name: data?.generic_name,
-            quantity: data?.product_quantity,
             categories_en: data?.categories_en,
+            brands: data?.brands,
             nutriscore_grade: data?.nutriscore_grade,
-            ecoscore_score: data?.ecoscore_score,
-            serving_size: data?.serving_size,
+            ecoscore_grade: data?.ecoscore_grade,
             novaClass: data?.nova_group,
+            predicted_nova_group: data?.predicted,
           };
           tableData.push(obj);
         });
@@ -93,9 +92,9 @@ function SearchResult() {
       width: "200px",
     },
     {
-      title: "Genric Name",
-      dataIndex: "generic_name",
-      key: "generic_name",
+      title: "Brand Name",
+      dataIndex: "brands",
+      key: "brands",
       // fixed: "left",
       render: (text) => (
         <span
@@ -109,14 +108,6 @@ function SearchResult() {
         </span>
       ),
       width: "250px",
-    },
-    {
-      title: "Quantity",
-      dataIndex: "quantity",
-      key: "quantity",
-      // fixed: "left",
-      render: (text) => <span style={{ color: "#638773" }}>{text || "-"}</span>,
-      width: "200px",
     },
     {
       title: "Categories",
@@ -153,6 +144,23 @@ function SearchResult() {
       width: "200px",
     },
     {
+      title: "Predicted Nova Class",
+      dataIndex: "predicted_nova_group",
+      key: "predicted",
+      render: (text) => (
+        <span
+          style={{
+            color: "#638773",
+            display: "flex",
+            justifyContent: "center",
+          }}
+        >
+          {text || "-"}
+        </span>
+      ),
+      width: "200px",
+    },
+    {
       title: "Nutrition Score",
       dataIndex: "nutriscore_grade",
       key: "totalFat",
@@ -170,26 +178,9 @@ function SearchResult() {
       width: "200px",
     },
     {
-      title: "Ecoscore Score",
-      dataIndex: "ecoscore_score",
-      key: "carbohydrate",
-      render: (text) => (
-        <span
-          style={{
-            color: "#638773",
-            display: "flex",
-            justifyContent: "center",
-          }}
-        >
-          {text || "-"}
-        </span>
-      ),
-      width: "200px",
-    },
-    {
-      title: "Serving Size",
-      dataIndex: "serving_size",
-      key: "serving_size",
+      title: "Ecoscore Grade",
+      dataIndex: "ecoscore_grade",
+      key: "ecoscore_grade",
       render: (text) => (
         <span
           style={{
