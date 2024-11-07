@@ -62,7 +62,7 @@ function SearchResult() {
         setData(tableData);
         setTableParams((prev) => ({
           ...prev,
-          total: res.data.data.totalCount,
+          total: res.data.data.totalLength,
         }));
         setLoading(false);
       })
@@ -81,6 +81,17 @@ function SearchResult() {
       dataIndex: "product_name",
       key: "product_name",
       fixed: "left",
+      render: (text) => (
+        <span
+          style={{
+            color: "#638773",
+            display: "flex",
+            justifyContent: "center",
+          }}
+        >
+          {text || "-"}
+        </span>
+      ),
       width: "200px",
       render: (text, record) => {
         // const handleClick = () => {

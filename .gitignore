@@ -17,3 +17,4 @@
 /client/.env
 
 ssl/
+main.py
