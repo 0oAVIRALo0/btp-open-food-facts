@@ -18,6 +18,8 @@ datasets/
 .env
 es
 
+ml/myenv/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

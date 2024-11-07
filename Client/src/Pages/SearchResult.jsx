@@ -73,8 +73,6 @@ function SearchResult() {
     apiCall(tableParams.page, tableParams.limit);
   }, [tableParams.page, tableParams.limit]);
   
-  // const history = useHistory(); 
-
   const columns = [
     {
       title: "Product Name",
@@ -94,12 +92,7 @@ function SearchResult() {
       ),
       width: "200px",
       render: (text, record) => {
-        // const handleClick = () => {
-        //   if (record?.id) {
-        //     history.push(`/view-more-details?id=${record.code}`);
-        //   }
-        // };
-  
+
         return (
           <span
             // onClick={handleClick}
