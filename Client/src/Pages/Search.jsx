@@ -42,36 +42,6 @@ function Search() {
     novaClass4: false,
   });
 
-  // const getUniqueCategories = () => {
-  //   axios.get("http://localhost:8000/api/v1/search/unique-categories")
-  //   .then((res) => {
-  //     setCategories((prev) => [...prev, ...res.data.data.categories]);
-  //   })
-  //   .catch((err) => {
-  //     console.log(err);
-  //   })
-  // }
-
-  // const getUniqueBrands = () => {
-  //   axios.get("http://localhost:8000/api/v1/search/unique-brands")
-  //   .then((res) => {
-  //     setBrands((prev) => [...prev, ...res.data.data.brands]);
-  //   })
-  //   .catch((err) => {
-  //     console.log(err);
-  //   })
-  // }
-
-  // const getUniqueProducts = () => {
-  //   axios.get("http://localhost:8000/api/v1/search/unique-product-names")
-  //   .then((res) => {
-  //     setProducts((prev) => [...prev, ...res.data.data.productNames]);
-  //   })
-  //   .catch((err) => {
-  //     console.log(err);
-  //   }) 
-  // }
-
   const [categoryPage, setCategoryPage] = useState(0);
   const [brandPage, setBrandPage] = useState(0);
   const [productPage, setProductPage] = useState(0);
@@ -79,40 +49,32 @@ function Search() {
   const getUniqueCategories = () => {
     const nextPage = categoryPage + 1;
     
-    // Fetch more categories from the API with pagination
     axios.get(`http://localhost:8000/api/v1/search/unique-categories?page=${nextPage}`)
       .then((res) => {
-        // Append new categories to existing ones
         setCategories(prevOptions => [...prevOptions, ...res.data.data.categories]);
-        setCategoryPage(nextPage); // Update to the new page number
+        setCategoryPage(nextPage);
       })
       .catch((err) => console.log(err));
   };
 
   const getUniqueBrands = () => {
-    // Increment the page number for brands
     const nextPage = brandPage + 1;
     
-    // Fetch more brands from the API with pagination
     axios.get(`http://localhost:8000/api/v1/search/unique-brands?category=${categoryName}&page=${nextPage}`)
       .then((res) => {
-        // Append new brands to existing ones
         setBrands(prevOptions => [...prevOptions, ...res.data.data.brands]);
-        setBrandPage(nextPage); // Update to the new page number
+        setBrandPage(nextPage); 
       })
       .catch((err) => console.log(err));
   };
 
   const getUniqueProducts = () => {
-    // Increment the page number for products
     const nextPage = productPage + 1;
     
-    // Fetch more products from the API with pagination
     axios.get(`http://localhost:8000/api/v1/search/unique-product-names?category=${categoryName}&brand=${brandName}&page=${nextPage}`)
       .then((res) => {
-        // Append new products to existing ones
         setProducts(prevOptions => [...prevOptions, ...res.data.data.productNames]);
-        setProductPage(nextPage); // Update to the new page number
+        setProductPage(nextPage); 
       })
       .catch((err) => console.log(err));
   };
@@ -191,43 +153,6 @@ function Search() {
       `/search-result?type=${type}&novaclass=${novaclass}&categoryName=${categoryName}&brandName=${brandName}&productName=${productName}`
     );
   };
-
-  // const [catOptions, setCatOptions] = useState([...categories]);
-
-  // const handleShowMoreCategories = () => {
-  //   // Simulate loading more categories (e.g., fetch from API)
-  //   const moreCategories = [
-  //     "Category 5",
-  //     "Category 6",
-  //     "Category 7",
-  //     "Category 8",
-  //   ];
-  //   setCategories(prevOptions => [...prevOptions, ...moreCategories]);
-  // };
-
-  // const handleShowMoreBrands = () => {
-  //   // Simulate loading more brands (e.g., fetch from API)
-  //   const moreBrands = [
-  //     "Brand 5",
-  //     "Brand 6",
-  //     "Brand 7",
-  //     "Brand 8",
-  //   ];
-
-  //   setBrands(prevOptions => [...prevOptions, ...moreBrands]);
-  // };
-
-  // const handleShowMoreProducts = () => {
-  //   // Simulate loading more products (e.g., fetch from API)
-  //   const moreProducts = [
-  //     "Product 5",
-  //     "Product 6",
-  //     "Product 7",
-  //     "Product 8",
-  //   ];
-
-  //   setProducts(prevOptions => [...prevOptions, ...moreProducts]);
-  // };
 
   const showMoreOption = "Show More";
 
