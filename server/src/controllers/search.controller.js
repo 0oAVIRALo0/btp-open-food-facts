@@ -11,7 +11,7 @@ let maxLength = 0;
 
 const client = new Client({
   node: process.env.ES_NODE,
-  requestTimeout: 1200000, 
+  requestTimeout: 1200000,
   maxRetries: 3,
   auth: {
     username: process.env.USERNAME,
@@ -26,7 +26,7 @@ const client = new Client({
   },
 });
 
-const getResultByNovaGroup = async (  
+const getResultByNovaGroup = async (
   pageNumber,
   entriesPerPage,
   novaGroups,
@@ -58,8 +58,8 @@ const getResultByNovaGroup = async (
     body: query,
   });
 
-  const endTime = new Date(); 
-  const timeTaken = endTime - startTime; 
+  const endTime = new Date();
+  const timeTaken = endTime - startTime;
 
   // console.log(
   //   "Full Elasticsearch response for nova groups:",
@@ -93,7 +93,7 @@ const getResultByNovaGroup = async (
     });
     maxLength = countResult.count;
     console.log("Max Length:", maxLength);
-  } else if (novaGroups.length === 4) { 
+  } else if (novaGroups.length === 4) {
     const countResult = await client.count({
       index: ES_INDEX,
       body: {
@@ -135,8 +135,9 @@ const getResultByNovaGroup = async (
 };
 
 const getUniqueCategories = asyncHandler(async (req, res) => {
-  const entriesPerPage = 100;
-  let from = 0;
+  const pageNumber = req.query.page || 1;
+  const entriesPerPage = 50;
+  let from = (pageNumber - 1) * entriesPerPage;
 
   let uniqueCategories = new Set();
 
@@ -180,8 +181,9 @@ const getUniqueCategories = asyncHandler(async (req, res) => {
 });
 
 const getUniqueBrands = asyncHandler(async (req, res) => {
-  const entriesPerPage = 100;
-  let from = 0;
+  const pageNumber = req.query.page || 1;
+  const entriesPerPage = 50;
+  let from = (pageNumber - 1) * entriesPerPage;
 
   let uniqueBrands = new Set();
 
@@ -223,8 +225,9 @@ const getUniqueBrands = asyncHandler(async (req, res) => {
 });
 
 const getUniqueProductNames = asyncHandler(async (req, res) => {
-  const entriesPerPage = 100;
-  let from = 0;
+  const pageNumber = req.query.page || 1;
+  const entriesPerPage = 50;
+  let from = (pageNumber - 1) * entriesPerPage;
 
   let uniqueProductNames = new Set();
 
@@ -389,7 +392,6 @@ const getResultByCategoryBrandProduct = async (
   };
 };
 
-
 const getDocumentById = asyncHandler(async (req, res) => {
   try {
     const id = req.params.id;
@@ -449,7 +451,6 @@ const getBrandNameByCategory = asyncHandler(async (req, res) => {
     index: ES_INDEX,
     body: query,
   });
-
 
   // console.log("Search Result:", JSON.stringify(searchResult, null, 2));
 
@@ -624,4 +625,12 @@ const searchResult = asyncHandler(async (req, res) => {
   }
 });
 
-export { searchResult, getDocumentById, getBrandNameByCategory, getProductNameByCategoryBrand, getUniqueCategories, getUniqueBrands, getUniqueProductNames };
+export {
+  searchResult,
+  getDocumentById,
+  getBrandNameByCategory,
+  getProductNameByCategoryBrand,
+  getUniqueCategories,
+  getUniqueBrands,
+  getUniqueProductNames,
+};
