@@ -61,10 +61,10 @@ const getResultByNovaGroup = async (
   const endTime = new Date(); 
   const timeTaken = endTime - startTime; 
 
-  console.log(
-    "Full Elasticsearch response for nova groups:",
-    JSON.stringify(searchResult, null, 2)
-  );
+  // console.log(
+  //   "Full Elasticsearch response for nova groups:",
+  //   JSON.stringify(searchResult, null, 2)
+  // );
   console.log(`API call took ${timeTaken} milliseconds.`);
 
   const documents = searchResult.hits.hits.map((hit) => hit._source);
@@ -88,6 +88,17 @@ const getResultByNovaGroup = async (
           terms: {
             nova_group: novaGroups,
           },
+        },
+      },
+    });
+    maxLength = countResult.count;
+    console.log("Max Length:", maxLength);
+  } else if (novaGroups.length === 4) { 
+    const countResult = await client.count({
+      index: ES_INDEX,
+      body: {
+        query: {
+          match_all: {},
         },
       },
     });
