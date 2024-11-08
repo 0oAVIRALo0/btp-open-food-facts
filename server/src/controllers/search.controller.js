@@ -462,7 +462,6 @@ const getBrandNameByCategory = asyncHandler(async (req, res) => {
         : brands.add(brandName);
     }
   });
-  console.log("HERE")
   // Update `from` to fetch the next batch
   from += entriesPerPage;
 
@@ -479,8 +478,8 @@ const getBrandNameByCategory = asyncHandler(async (req, res) => {
 const getProductNameByCategoryBrand = asyncHandler(async (req, res) => {
   const entriesPerPage = 100;
   let from = 0;
-  const category = req.body.categoryName;
-  const brand = req.body.brandName;
+  const category = req.query.categoryName;
+  const brand = req.query.brandName;
   // Set to collect unique brand names
   const products = new Set();
 
