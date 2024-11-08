@@ -42,7 +42,7 @@ function Search() {
     novaClass4: false,
   });
 
-  const getCategories = () => {
+  const getUniqueCategories = () => {
     // Api call to get categories
     axios.get("http://localhost:8000/api/v1/search/unique-categories")
     .then((res) => {
@@ -54,7 +54,7 @@ function Search() {
     })
   }
 
-  const getBrands = () => {
+  const getUniqueBrands = () => {
     // Api call to get brands
     axios.get("http://localhost:8000/api/v1/search/unique-brands")
     .then((res) => {
@@ -66,7 +66,7 @@ function Search() {
     })
   }
 
-  const getProducts = () => {
+  const getUniqueProducts = () => {
     // Api call to get products
     axios.get("http://localhost:8000/api/v1/search/unique-product-names")
     .then((res) => {
@@ -79,10 +79,44 @@ function Search() {
   }
 
   useEffect(() => {
-    getCategories();
-    getBrands();
-    getProducts();
+    getUniqueCategories();
+    getUniqueBrands();
+    getUniqueProducts();
   }, []);
+  
+  const getBrands = (selectedCategory) => {
+    axios.get(`http://localhost:8000/api/v1/search/getBrandByCategory?categoryName=${selectedCategory}`)
+      .then((res) => {
+        setBrands(res.data.data.resultBrands);
+        setProducts([]); 
+        console.log("WTF", res.data.data.resultBrands)
+      })
+      .catch((err) => console.log(err));
+  };
+  
+  const getProducts = (selectedCategory, selectedBrand) => {
+    axios.get(`http://localhost:8000/api/v1/search/unique-product-names?category=${selectedCategory}&brand=${selectedBrand}`)
+      .then((res) => {
+        setProducts(res.data.data.productNames);
+      })
+      .catch((err) => console.log(err));
+  };
+  
+  // Fetch brands when categoryName changes
+  useEffect(() => {
+    if (categoryName) {
+      getBrands(categoryName);
+      setBrandName(""); 
+    }
+  }, [categoryName]);
+  
+  // Fetch products when brandName changes
+  useEffect(() => {
+    if (categoryName && brandName) {
+      getProducts(categoryName, brandName);
+      setProductName(""); // Clear product selection if brand changes
+    }
+  }, [brandName]);
 
   const handleChangeNovaClass = (event) => {
     setState({
@@ -313,8 +347,8 @@ function Search() {
                           options={categories}
                           value={categoryName}
                           freeSolo
-                          onChange={(e, newValue) => setCategoryName(newValue)}  // Sets value when option is selected
-                          onInputChange={(e, newInputValue) => setCategoryName(newInputValue)} // Capture changes when user types
+                          onChange={(e, newValue) => {setCategoryName(newValue)}}  
+                          onInputChange={(e, newInputValue) => setCategoryName(newInputValue)} 
                           sx={{
                             width: "200px",
                           }}
@@ -335,7 +369,6 @@ function Search() {
                             </li>
                           )}
                           
-                          // Add the "Show More" button below the dropdown list
                           ListboxComponent={(props) => (
                             <div {...props}>
                               {props.children}

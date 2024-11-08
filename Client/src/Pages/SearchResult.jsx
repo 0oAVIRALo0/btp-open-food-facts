@@ -24,16 +24,6 @@ function SearchResult() {
   const apiCall = (page, limit) => {
     setLoading(true);
 
-    // const formData = new URLSearchParams();
-    // formData.append("categoryName", categoryName || "");
-    // formData.append("brandName", brandName || "");
-    // formData.append("productName", productName || "");
-
-    // const formDataObject = {};
-    // formData.forEach((value, key) => {
-    //   formDataObject[key] = value;
-    // });
-
     const requestBody = {
       categoryName: categoryName || "",
       brandName: brandName || "",
@@ -55,7 +45,7 @@ function SearchResult() {
         // console.log(res.data.data.documents);
         const apiData = res.data.data.documents;
         setData(apiData || []);
-        console.log("WTF", apiData);
+        // console.log("WTF", apiData);
         let tableData = [];
         apiData.map((data) => {
           let obj = {

@@ -18,7 +18,7 @@ function SingleProduct() {
 
   const apiCall = (page, limit) => {
     setLoading(true);
-    console.log("WTF", id);
+    // console.log("WTF", id);
     axios
       .get(
         `http://localhost:8000/api/v1/search/document/${id}?pageNumber=${page}&entriesPerPage=${limit}`,
@@ -31,7 +31,7 @@ function SingleProduct() {
       .then((res) => {
         const apiData = res.data.data.documents;
         setData(apiData || []);
-        console.log("WTF", apiData);
+        // console.log("WTF", apiData);
         let tableData = [];
         apiData.map((data) => {
           let obj = {
