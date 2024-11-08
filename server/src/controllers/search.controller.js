@@ -20,11 +20,7 @@ const client = new Client({
   },
   tls: {
     ca: fs.readFileSync(
-<<<<<<< Updated upstream
-      "/Users/aviralchauhan/aws-es-kibana/elasticsearch-8.15.3/config/certs/http_ca.crt"
-=======
       "/Users/mahanshaditya/Downloads/DevTools/elasticsearch/config/certs/http_ca.crt"
->>>>>>> Stashed changes
     ),
     rejectUnauthorized: false,
   },
