@@ -431,7 +431,7 @@ const getDocumentById = asyncHandler(async (req, res) => {
 const getBrandNameByCategory = asyncHandler(async (req, res) => {
   const entriesPerPage = 100;
   let from = 0;
-  const category = req.body.categoryName;
+  const category = req.query.categoryName;
 
   // Set to collect unique brand names
   const brands = new Set();
@@ -452,7 +452,7 @@ const getBrandNameByCategory = asyncHandler(async (req, res) => {
   });
 
   // Log the search result for debugging if needed
-  console.log("Search Result:", JSON.stringify(searchResult, null, 2));
+  // console.log("Search Result:", JSON.stringify(searchResult, null, 2));
 
   // Extract and add brand names to the Set
   searchResult.hits.hits.forEach((hit) => {
@@ -480,8 +480,8 @@ const getBrandNameByCategory = asyncHandler(async (req, res) => {
 const getProductNameByCategoryBrand = asyncHandler(async (req, res) => {
   const entriesPerPage = 100;
   let from = 0;
-  const category = req.body.categoryName;
-  const brand = req.body.brandName;
+  const category = req.query.categoryName;
+  const brand = req.query.brandName;
   // Set to collect unique brand names
   const products = new Set();
 
