@@ -20,7 +20,7 @@ const client = new Client({
   },
   tls: {
     ca: fs.readFileSync(
-      "/Users/mahanshaditya/Downloads/DevTools/elasticsearch/config/certs/http_ca.crt"
+      "/Users/aviralchauhan/aws-es-kibana/elasticsearch-8.15.3/config/certs/http_ca.crt"
     ),
     rejectUnauthorized: false,
   },
@@ -462,7 +462,6 @@ const getBrandNameByCategory = asyncHandler(async (req, res) => {
         : brands.add(brandName);
     }
   });
-  console.log("HERE")
   // Update `from` to fetch the next batch
   from += entriesPerPage;
 

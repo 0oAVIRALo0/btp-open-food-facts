@@ -42,41 +42,80 @@ function Search() {
     novaClass4: false,
   });
 
+  // const getUniqueCategories = () => {
+  //   axios.get("http://localhost:8000/api/v1/search/unique-categories")
+  //   .then((res) => {
+  //     setCategories((prev) => [...prev, ...res.data.data.categories]);
+  //   })
+  //   .catch((err) => {
+  //     console.log(err);
+  //   })
+  // }
+
+  // const getUniqueBrands = () => {
+  //   axios.get("http://localhost:8000/api/v1/search/unique-brands")
+  //   .then((res) => {
+  //     setBrands((prev) => [...prev, ...res.data.data.brands]);
+  //   })
+  //   .catch((err) => {
+  //     console.log(err);
+  //   })
+  // }
+
+  // const getUniqueProducts = () => {
+  //   axios.get("http://localhost:8000/api/v1/search/unique-product-names")
+  //   .then((res) => {
+  //     setProducts((prev) => [...prev, ...res.data.data.productNames]);
+  //   })
+  //   .catch((err) => {
+  //     console.log(err);
+  //   }) 
+  // }
+
+  const [categoryPage, setCategoryPage] = useState(0);
+  const [brandPage, setBrandPage] = useState(0);
+  const [productPage, setProductPage] = useState(0);
+
   const getUniqueCategories = () => {
-    // Api call to get categories
-    axios.get("http://localhost:8000/api/v1/search/unique-categories")
-    .then((res) => {
-      // console.log(res.data.data.categories);
-      setCategories((prev) => [...prev, ...res.data.data.categories]);
-    })
-    .catch((err) => {
-      console.log(err);
-    })
-  }
+    const nextPage = categoryPage + 1;
+    
+    // Fetch more categories from the API with pagination
+    axios.get(`http://localhost:8000/api/v1/search/unique-categories?page=${nextPage}`)
+      .then((res) => {
+        // Append new categories to existing ones
+        setCategories(prevOptions => [...prevOptions, ...res.data.data.categories]);
+        setCategoryPage(nextPage); // Update to the new page number
+      })
+      .catch((err) => console.log(err));
+  };
 
   const getUniqueBrands = () => {
-    // Api call to get brands
-    axios.get("http://localhost:8000/api/v1/search/unique-brands")
-    .then((res) => {
-      // console.log(res.data.data.brands);
-      setBrands((prev) => [...prev, ...res.data.data.brands]);
-    })
-    .catch((err) => {
-      console.log(err);
-    })
-  }
+    // Increment the page number for brands
+    const nextPage = brandPage + 1;
+    
+    // Fetch more brands from the API with pagination
+    axios.get(`http://localhost:8000/api/v1/search/unique-brands?category=${categoryName}&page=${nextPage}`)
+      .then((res) => {
+        // Append new brands to existing ones
+        setBrands(prevOptions => [...prevOptions, ...res.data.data.brands]);
+        setBrandPage(nextPage); // Update to the new page number
+      })
+      .catch((err) => console.log(err));
+  };
 
   const getUniqueProducts = () => {
-    // Api call to get products
-    axios.get("http://localhost:8000/api/v1/search/unique-product-names")
-    .then((res) => {
-      // console.log(res.data.data.productNames);
-      setProducts((prev) => [...prev, ...res.data.data.productNames]);
-    })
-    .catch((err) => {
-      console.log(err);
-    }) 
-  }
+    // Increment the page number for products
+    const nextPage = productPage + 1;
+    
+    // Fetch more products from the API with pagination
+    axios.get(`http://localhost:8000/api/v1/search/unique-product-names?category=${categoryName}&brand=${brandName}&page=${nextPage}`)
+      .then((res) => {
+        // Append new products to existing ones
+        setProducts(prevOptions => [...prevOptions, ...res.data.data.productNames]);
+        setProductPage(nextPage); // Update to the new page number
+      })
+      .catch((err) => console.log(err));
+  };
 
   useEffect(() => {
     getUniqueCategories();
@@ -89,20 +128,19 @@ function Search() {
       .then((res) => {
         setBrands(res.data.data);
         setProducts([]); 
-        console.log("WTF", res.data.data)
       })
       .catch((err) => console.log(err));
   };
   
   const getProducts = (selectedCategory, selectedBrand) => {
-    axios.get(`http://localhost:8000/api/v1/search/unique-product-names?category=${selectedCategory}&brand=${selectedBrand}`)
+    axios.get(`http://localhost:8000/api/v1/search/getProductNameByCategory&Brand?categoryName=${selectedCategory}&brandName=${selectedBrand}`)
       .then((res) => {
-        setProducts(res.data.data.productNames);
+        setProducts(res.data.data);
+        console.log("WTF", res.data.data)
       })
       .catch((err) => console.log(err));
   };
   
-  // Fetch brands when categoryName changes
   useEffect(() => {
     if (categoryName) {
       getBrands(categoryName);
@@ -110,11 +148,10 @@ function Search() {
     }
   }, [categoryName]);
   
-  // Fetch products when brandName changes
   useEffect(() => {
     if (categoryName && brandName) {
       getProducts(categoryName, brandName);
-      setProductName(""); // Clear product selection if brand changes
+      setProductName(""); 
     }
   }, [brandName]);
 
@@ -155,42 +192,42 @@ function Search() {
     );
   };
 
-  const [catOptions, setCatOptions] = useState([...categories]);
+  // const [catOptions, setCatOptions] = useState([...categories]);
 
-  const handleShowMoreCategories = () => {
-    // Simulate loading more categories (e.g., fetch from API)
-    const moreCategories = [
-      "Category 5",
-      "Category 6",
-      "Category 7",
-      "Category 8",
-    ];
-    setCategories(prevOptions => [...prevOptions, ...moreCategories]);
-  };
+  // const handleShowMoreCategories = () => {
+  //   // Simulate loading more categories (e.g., fetch from API)
+  //   const moreCategories = [
+  //     "Category 5",
+  //     "Category 6",
+  //     "Category 7",
+  //     "Category 8",
+  //   ];
+  //   setCategories(prevOptions => [...prevOptions, ...moreCategories]);
+  // };
 
-  const handleShowMoreBrands = () => {
-    // Simulate loading more brands (e.g., fetch from API)
-    const moreBrands = [
-      "Brand 5",
-      "Brand 6",
-      "Brand 7",
-      "Brand 8",
-    ];
+  // const handleShowMoreBrands = () => {
+  //   // Simulate loading more brands (e.g., fetch from API)
+  //   const moreBrands = [
+  //     "Brand 5",
+  //     "Brand 6",
+  //     "Brand 7",
+  //     "Brand 8",
+  //   ];
 
-    setBrands(prevOptions => [...prevOptions, ...moreBrands]);
-  };
+  //   setBrands(prevOptions => [...prevOptions, ...moreBrands]);
+  // };
 
-  const handleShowMoreProducts = () => {
-    // Simulate loading more products (e.g., fetch from API)
-    const moreProducts = [
-      "Product 5",
-      "Product 6",
-      "Product 7",
-      "Product 8",
-    ];
+  // const handleShowMoreProducts = () => {
+  //   // Simulate loading more products (e.g., fetch from API)
+  //   const moreProducts = [
+  //     "Product 5",
+  //     "Product 6",
+  //     "Product 7",
+  //     "Product 8",
+  //   ];
 
-    setProducts(prevOptions => [...prevOptions, ...moreProducts]);
-  };
+  //   setProducts(prevOptions => [...prevOptions, ...moreProducts]);
+  // };
 
   const showMoreOption = "Show More";
 
@@ -374,7 +411,7 @@ function Search() {
                               {props.children}
                               <ListSubheader>
                                 <Button
-                                  onClick={handleShowMoreCategories}
+                                  onClick={getUniqueCategories}
                                   style={{
                                     color: "blue",
                                     fontWeight: "bold",
@@ -440,7 +477,7 @@ function Search() {
                               {props.children}
                               <ListSubheader>
                                 <Button
-                                  onClick={handleShowMoreBrands}
+                                  onClick={getUniqueBrands}
                                   style={{
                                     color: "blue",
                                     fontWeight: "bold",
@@ -506,7 +543,7 @@ function Search() {
                               {props.children}
                               <ListSubheader>
                                 <Button
-                                  onClick={handleShowMoreProducts}
+                                  onClick={getUniqueProducts}
                                   style={{
                                     color: "blue",
                                     fontWeight: "bold",
