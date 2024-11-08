@@ -38,6 +38,7 @@ function SearchResult() {
       categoryName: categoryName || "",
       brandName: brandName || "",
       productName: productName || "",
+      novaClass: novaclass || "",
     };
 
     axios

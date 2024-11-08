@@ -530,10 +530,10 @@ const searchResult = asyncHandler(async (req, res) => {
 
     // Handling NOVA group query
     if (type === "novaclass") {
-      const novaGroup = req.body.novaclass;
-      const novaGroups = novaGroup
-        ? novaGroup.split(",").map((group) => group.trim())
-        : [];
+      const novaGroups = req.body.novaClass;
+      // const novaGroups = novaGroup
+      //   ? novaGroup.split(",").map((group) => group.trim())
+      //   : [];
 
       console.log("Nova Groups:", novaGroups);
 
