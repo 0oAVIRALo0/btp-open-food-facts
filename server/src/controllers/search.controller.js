@@ -6,7 +6,7 @@ import { Client } from "@elastic/elasticsearch";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import fs from "fs";
 
-const ES_INDEX = "open-food-facts-dataset";
+const ES_INDEX = "open-food-facts-database";
 let maxLength = 0;
 
 const client = new Client({
@@ -20,7 +20,7 @@ const client = new Client({
   },
   tls: {
     ca: fs.readFileSync(
-      "/Users/aviralchauhan/aws-es-kibana/elasticsearch-8.15.1/config/certs/http_ca.crt"
+      "/Users/aviralchauhan/aws-es-kibana/elasticsearch-8.15.3/config/certs/http_ca.crt"
     ),
     rejectUnauthorized: false,
   },
@@ -143,7 +143,7 @@ const getUniqueCategories = asyncHandler(async (req, res) => {
   });
 
   searchResult.hits.hits.forEach((hit) => {
-    const categories = hit._source.categories_en;
+    const categories = hit._source.main_category_en;
 
     if (categories) {
       Array.isArray(categories)
@@ -156,7 +156,7 @@ const getUniqueCategories = asyncHandler(async (req, res) => {
 
   const resultCategories = [...uniqueCategories];
 
-  console.log("Unique Categories:", resultCategories);
+  // console.log("Unique Categories:", resultCategories);
 
   console.log("Number of unique categories:", resultCategories.length);
 
@@ -199,7 +199,7 @@ const getUniqueBrands = asyncHandler(async (req, res) => {
   from += entriesPerPage;
   const resultBrands = [...uniqueBrands];
 
-  console.log("Unique Brands:", resultBrands);
+  // console.log("Unique Brands:", resultBrands);
 
   console.log("Number of unique brands:", resultBrands.length);
 
@@ -242,7 +242,7 @@ const getUniqueProductNames = asyncHandler(async (req, res) => {
 
   const resultProductNames = [...uniqueProductNames];
 
-  console.log("Unique Product Names:", resultProductNames);
+  // console.log("Unique Product Names:", resultProductNames);
 
   console.log("Number of unique product names:", resultProductNames.length);
 
@@ -302,34 +302,21 @@ const getResultByCategoryBrandProduct = async (
   product,
   from
 ) => {
-  const mustQueries = [];
+  const mustClauses = [];
 
-  // Add conditions to the query if category, brand, or product is provided
   if (category) {
-    mustQueries.push({
-      match: {
-        categories_en: category,
-      },
-    });
+    mustClauses.push({ match: { main_category_en: category } });
   }
 
   if (brand) {
-    mustQueries.push({
-      match: {
-        brands_tags: brand,
-      },
-    });
+    mustClauses.push({ match: { brands: brand } });
   }
 
   if (product) {
-    mustQueries.push({
-      match: {
-        product_name: product,
-      },
-    });
+    mustClauses.push({ match: { product_name: product } });
   }
 
-  if (mustQueries.length === 0) {
+  if (mustClauses.length === 0) {
     return {
       success: false,
       message: "At least one of category, brand, or product must be provided.",
@@ -339,7 +326,7 @@ const getResultByCategoryBrandProduct = async (
   const countQuery = {
     query: {
       bool: {
-        must: mustQueries,
+        must: mustClauses,
       },
     },
   };
@@ -347,7 +334,7 @@ const getResultByCategoryBrandProduct = async (
   const searchQuery = {
     query: {
       bool: {
-        must: mustQueries,
+        must: mustClauses,
       },
     },
     size: entriesPerPage,
@@ -441,7 +428,7 @@ const getBrandNameByCategory = asyncHandler(async (req, res) => {
   const query = {
     query: {
       match: {
-        categories_en: category,
+        main_category_en: category,
       },
     },
     size: entriesPerPage,
@@ -491,7 +478,7 @@ const getProductNameByCategoryBrand = asyncHandler(async (req, res) => {
     query: {
       bool: {
         must: [
-          { match: { categories_en: category } },
+          { match: { main_category_en: category } },
           { match: { brands: brand } },
         ],
       },
@@ -533,9 +520,12 @@ const getProductNameByCategoryBrand = asyncHandler(async (req, res) => {
 const searchResult = asyncHandler(async (req, res) => {
   try {
     const pageNumber = parseInt(req.query.pageNumber) || 1;
+    console.log("Page Number:", pageNumber);
     const entriesPerPage = parseInt(req.query.entriesPerPage) || 10;
+    console.log("Entries Per Page:", entriesPerPage);
     const from = (pageNumber - 1) * entriesPerPage;
     const type = req.query.type;
+    console.log("Type:", type);
     let data = {};
 
     // Handling NOVA group query
@@ -564,11 +554,17 @@ const searchResult = asyncHandler(async (req, res) => {
 
     // Handling category, brand, or product query
     if (type === "category") {
+      console.log("Query", req.query);
+      console.log("Body", req.body);
       const category = req.body.categoryName;
+      console.log("Category:", category);
       const brand = req.body.brandName;
+      console.log("Brand:", brand);
       const product = req.body.productName;
+      console.log("Product:", product);
 
       if (!category && !brand && !product) {
+        console.log("Fetching all data.");
         data = await getAllData(pageNumber, entriesPerPage, from);
         console.log("Max Length:", data.maxLength);
 

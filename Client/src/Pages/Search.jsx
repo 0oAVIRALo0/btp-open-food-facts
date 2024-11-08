@@ -46,7 +46,7 @@ function Search() {
     // Api call to get categories
     axios.get("http://localhost:8000/api/v1/search/unique-categories")
     .then((res) => {
-      console.log(res.data.data.categories);
+      // console.log(res.data.data.categories);
       setCategories((prev) => [...prev, ...res.data.data.categories]);
     })
     .catch((err) => {
@@ -58,7 +58,7 @@ function Search() {
     // Api call to get brands
     axios.get("http://localhost:8000/api/v1/search/unique-brands")
     .then((res) => {
-      console.log(res.data.data.brands);
+      // console.log(res.data.data.brands);
       setBrands((prev) => [...prev, ...res.data.data.brands]);
     })
     .catch((err) => {
@@ -70,7 +70,7 @@ function Search() {
     // Api call to get products
     axios.get("http://localhost:8000/api/v1/search/unique-product-names")
     .then((res) => {
-      console.log(res.data.data.productNames);
+      // console.log(res.data.data.productNames);
       setProducts((prev) => [...prev, ...res.data.data.productNames]);
     })
     .catch((err) => {
@@ -395,6 +395,11 @@ function Search() {
                               }}
                             />
                           )}
+                          renderOption={(props, option) => (
+                            <li {...props} key={option.id}>
+                              {option}
+                            </li>
+                          )}
 
                           // Add the "Show More" button below the dropdown list
                           ListboxComponent={(props) => (
@@ -455,6 +460,11 @@ function Search() {
                                 style: { color: "green" }, // Apply green text color
                               }}
                             />
+                          )}
+                          renderOption={(props, option) => (
+                            <li {...props} key={option.id}>
+                              {option}
+                            </li>
                           )}
 
                           // Add the "Show More" button below the dropdown list

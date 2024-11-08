@@ -24,20 +24,29 @@ function SearchResult() {
   const apiCall = (page, limit) => {
     setLoading(true);
 
-    const formData = new URLSearchParams();
-    formData.append("novaclass", novaclass);
-    formData.append("categoryName", categoryName || "");
-    formData.append("brandName", brandName || "");
-    formData.append("productName", productName || "");
+    // const formData = new URLSearchParams();
+    // formData.append("categoryName", categoryName || "");
+    // formData.append("brandName", brandName || "");
+    // formData.append("productName", productName || "");
 
-    // /searchResult?type=category&macroclass=Fruit&catname=&description=&novaclass=&Protein=0,14.26&Total%20Fat=0,25.05&Carbohydrate=2.19,59.25&Sugars,%20total=0,31.5&Fiber,%20total%20dietary=0,6.21&Calcium=0,283.17&Iron=0,9.07&Sodium=0,1171.91&Vitamin=0,2.1&Cholesterol=0,62.7&Fatty%20acids,%20total%20saturated=0,8.71&Potassium=0,518.72&Energy=57.82,408.16
+    // const formDataObject = {};
+    // formData.forEach((value, key) => {
+    //   formDataObject[key] = value;
+    // });
+
+    const requestBody = {
+      categoryName: categoryName || "",
+      brandName: brandName || "",
+      productName: productName || "",
+    };
+
     axios
       .post(
         `http://localhost:8000/api/v1/search/search-result?type=${type}&pageNumber=${page}&entriesPerPage=${limit}`,
-        formData,
+        requestBody,
         {
           headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
+            "Content-Type": "application/json",
           },
         }
       )
@@ -52,7 +61,7 @@ function SearchResult() {
             _id: data?._id,
             product_name: data?.product_name,
             novaClass: data?.nova_group,
-            predictedNoveClass: data?.predictedNoveClass,
+            predicted: data?.predicted,
             categories_en: data?.categories_en,
             brands: data?.brands,
             nutriscore_grade: data?.nutriscore_grade,
@@ -245,6 +254,7 @@ function SearchResult() {
       key: "novaClass",
       render: (text) => {
         let color;
+        // console.log(typeof text);
         
         switch (text) {
           case 1:
@@ -279,8 +289,8 @@ function SearchResult() {
     },
     {
       title: "Predicted Nova Class",
-      dataIndex: "predictedNovaClass",
-      key: "predictedNovaClass",
+      dataIndex: "predicted",
+      key: "predicted",
       render: (text) => {
         let color, backgroundColor;
     
@@ -536,3 +546,6 @@ function SearchResult() {
 }
 
 export default SearchResult;
+
+
+// /searchResult?type=category&macroclass=Fruit&catname=&description=&novaclass=&Protein=0,14.26&Total%20Fat=0,25.05&Carbohydrate=2.19,59.25&Sugars,%20total=0,31.5&Fiber,%20total%20dietary=0,6.21&Calcium=0,283.17&Iron=0,9.07&Sodium=0,1171.91&Vitamin=0,2.1&Cholesterol=0,62.7&Fatty%20acids,%20total%20saturated=0,8.71&Potassium=0,518.72&Energy=57.82,408.16
