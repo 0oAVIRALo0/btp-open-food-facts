@@ -14,6 +14,13 @@ dist-ssr
 *.local
 .env
 
+datasets/
+data/
+logstash/
+.env
+es
+
+ml/myenv/
 
 # Editor directories and files
 .vscode/*

@@ -16,7 +16,7 @@ function Footer() {
         <p>
           This work is licensed under a&nbsp;
           <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/">
-            <strong>
+            <strong style={{fontWeight: '700'}}> 
               Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported
               License.
             </strong>
@@ -33,7 +33,7 @@ function Footer() {
         <br />
         <div className="__institute_details">
           <a href="https://iiitd.ac.in/" target={"_blank"}>
-            <strong>
+            <strong style={{fontWeight: '700'}}> 
               {" "}
               Indraprastha Institute of Information Technology Delhi
               (IIIT-Delhi){" "}
@@ -41,7 +41,7 @@ function Footer() {
           </a>
           &nbsp; | &nbsp;
           <a href="https://cosylab.iiitd.edu.in/" target={"_blank"}>
-            <strong> Prof. Ganesh Bagler</strong>
+            <strong style={{fontWeight: '700'}}> Prof. Ganesh Bagler</strong>
           </a>
         </div>
         <div className="__social_media">
