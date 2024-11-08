@@ -20,7 +20,7 @@ const client = new Client({
   },
   tls: {
     ca: fs.readFileSync(
-      "/Users/aviralchauhan/aws-es-kibana/elasticsearch-8.15.3/config/certs/http_ca.crt"
+      "/Users/mahanshaditya/Downloads/DevTools/elasticsearch/config/certs/http_ca.crt"
     ),
     rejectUnauthorized: false,
   },
@@ -433,7 +433,6 @@ const getBrandNameByCategory = asyncHandler(async (req, res) => {
   let from = 0;
   const category = req.query.categoryName;
 
-  // Set to collect unique brand names
   const brands = new Set();
 
   const query = {
@@ -451,7 +450,7 @@ const getBrandNameByCategory = asyncHandler(async (req, res) => {
     body: query,
   });
 
-  // Log the search result for debugging if needed
+
   // console.log("Search Result:", JSON.stringify(searchResult, null, 2));
 
   // Extract and add brand names to the Set
@@ -463,7 +462,7 @@ const getBrandNameByCategory = asyncHandler(async (req, res) => {
         : brands.add(brandName);
     }
   });
-
+  console.log("HERE")
   // Update `from` to fetch the next batch
   from += entriesPerPage;
 
@@ -541,7 +540,11 @@ const searchResult = asyncHandler(async (req, res) => {
 
     // Handling NOVA group query
     if (type === "novaclass") {
-      const novaGroups = req.body.novaclass;
+      const novaGroups = req.body.novaClass;
+      // const novaGroups = novaGroup
+      //   ? novaGroup.split(",").map((group) => group.trim())
+      //   : [];
+
       console.log("Nova Groups:", novaGroups);
 
       data = await getResultByNovaGroup(
