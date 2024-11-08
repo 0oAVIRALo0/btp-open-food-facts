@@ -87,9 +87,9 @@ function Search() {
   const getBrands = (selectedCategory) => {
     axios.get(`http://localhost:8000/api/v1/search/getBrandByCategory?categoryName=${selectedCategory}`)
       .then((res) => {
-        setBrands(res.data.data.resultBrands);
+        setBrands(res.data.data);
         setProducts([]); 
-        console.log("WTF", res.data.data.resultBrands)
+        console.log("WTF", res.data.data)
       })
       .catch((err) => console.log(err));
   };

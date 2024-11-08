@@ -433,6 +433,8 @@ const getBrandNameByCategory = asyncHandler(async (req, res) => {
   let from = 0;
   const category = req.query.categoryName;
 
+  const brands = new Set();
+
   const query = {
     query: {
       match: {
