@@ -20,7 +20,7 @@ const client = new Client({
   },
   tls: {
     ca: fs.readFileSync(
-      "/Users/aviralchauhan/aws-es-kibana/elasticsearch-8.15.3/config/certs/http_ca.crt"
+      "/Users/mahanshaditya/Downloads/DevTools/elasticsearch/config/certs/http_ca.crt"
     ),
     rejectUnauthorized: false,
   },
@@ -136,7 +136,7 @@ const getResultByNovaGroup = async (
 
 const getUniqueCategories = asyncHandler(async (req, res) => {
   const pageNumber = req.query.page || 1;
-  const entriesPerPage = 50;
+  const entriesPerPage = 30;
   let from = (pageNumber - 1) * entriesPerPage;
 
   let uniqueCategories = new Set();
@@ -182,7 +182,7 @@ const getUniqueCategories = asyncHandler(async (req, res) => {
 
 const getUniqueBrands = asyncHandler(async (req, res) => {
   const pageNumber = req.query.page || 1;
-  const entriesPerPage = 50;
+  const entriesPerPage = 30;
   let from = (pageNumber - 1) * entriesPerPage;
 
   let uniqueBrands = new Set();
@@ -226,7 +226,7 @@ const getUniqueBrands = asyncHandler(async (req, res) => {
 
 const getUniqueProductNames = asyncHandler(async (req, res) => {
   const pageNumber = req.query.page || 1;
-  const entriesPerPage = 50;
+  const entriesPerPage = 30;
   let from = (pageNumber - 1) * entriesPerPage;
 
   let uniqueProductNames = new Set();
@@ -400,7 +400,7 @@ const getDocumentById = asyncHandler(async (req, res) => {
       body: {
         query: {
           match: {
-            _id: id,
+            code: id,
           },
         },
       },

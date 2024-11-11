@@ -3,8 +3,8 @@ import axios from "axios";
 
 import {nutrientData, meanMedian, test12Data, test65Data, test102Data, test12Data as testData} from "../data";
 
-import {InputLabel, Container, Button, CircularProgress, Slider, InputAdornment, TextField} from "@mui/material";
-import { Button as AntdButton, Modal, Select} from 'antd';
+import { Container, Button, CircularProgress, Slider, InputAdornment, TextField} from "@mui/material";
+import { Modal, Select} from 'antd';
 import {CaretDownOutlined} from '@ant-design/icons';
 import { PiStepsFill } from "react-icons/pi";
 import { PiLeafFill } from "react-icons/pi";

@@ -18,10 +18,9 @@ function SingleProduct() {
 
   const apiCall = (page, limit) => {
     setLoading(true);
-    // console.log("WTF", id);
     axios
       .get(
-        `http://localhost:8000/api/v1/search/document/${id}?pageNumber=${page}&entriesPerPage=${limit}`,
+        `http://localhost:8000/api/v1/search/document/${id}`,
         {
           headers: {
             "Content-Type": "application/x-www-form-urlencoded",
@@ -29,24 +28,31 @@ function SingleProduct() {
         }
       )
       .then((res) => {
-        const apiData = res.data.data.documents;
+        const apiData = res.data.data;
         setData(apiData || []);
-        // console.log("WTF", apiData);
+        console.log("WTF", apiData);
         let tableData = [];
-        apiData.map((data) => {
-          let obj = {
-            _id: data?._id,
-            product_name: data?.product_name,
-            generic_name: data?.generic_name,
-            quantity: data?.product_quantity,
-            categories_en: data?.categories_en,
-            nutriscore_grade: data?.nutriscore_grade,
-            ecoscore_score: data?.ecoscore_score,
-            serving_size: data?.serving_size,
-            novaClass: data?.nova_group,
-          };
-          tableData.push(obj);
-        });
+        let obj = {
+          _id: apiData?.code,
+          product_name: apiData?.product_name,
+          novaClass: apiData?.nova_group,
+          predictedNoveClass: apiData?.predicted,
+          categories: apiData?.main_category_en,
+          brands: apiData?.brands,
+          country: apiData?.countries_en,
+          nutriscore_grade: apiData?.nutriscore_grade,
+          ecoscore_grade: apiData?.ecoscore_grade,
+          ingredients_analysis : apiData?.ingredients_analysis_tags,
+          additives : apiData?.additives_n,
+          pnns_groups_1: apiData?.pnns_groups_1,
+          pnns_groups_2: apiData?.pnns_groups_2,
+          food_groups : apiData?.food_groups_en,
+          nutrient_levels: apiData?.nutrient_levels_tags,
+          completeness: apiData?.completeness,
+          nutrition_100g: apiData?.["nutrition-score-fr_100g"],
+        };
+        console.log("WTF", )
+        tableData.push(obj);
 
         setData(tableData);
         setTableParams((prev) => ({
@@ -72,10 +78,35 @@ function SingleProduct() {
       dataIndex: "product_name",
       key: "product_name",
       fixed: "left",
+      width: "180px",
+      render: (text, record) => {
+        return (
+          <span
+            onClick={() => {
+               navigate(`/food-product-detail?id=${record._id}`);
+             }}
+            style={{
+              color: "#000",
+              display: "flex",
+              justifyContent: "center",
+              cursor: "pointer", 
+            }}
+          >
+            {text || "-"}
+          </span>
+        );
+      },
+    },
+    {
+      title: "Brand Name",
+      dataIndex: "brands",
+      key: "brands",
+      fixed: "left",
+      width: "180px",
       render: (text) => (
         <span
           style={{
-            color: "#638773",
+            color: "#000",
             display: "flex",
             justifyContent: "center",
           }}
@@ -83,42 +114,17 @@ function SingleProduct() {
           {text || "-"}
         </span>
       ),
-      width: "200px",
-    },
-    {
-      title: "Genric Name",
-      dataIndex: "generic_name",
-      key: "generic_name",
-      // fixed: "left",
-      render: (text) => (
-        <span
-          style={{
-            color: "#638773",
-            display: "flex",
-            justifyContent: "center",
-          }}
-        >
-          {text || "-"}
-        </span>
-      ),
-      width: "250px",
-    },
-    {
-      title: "Quantity",
-      dataIndex: "quantity",
-      key: "quantity",
-      // fixed: "left",
-      render: (text) => <span style={{ color: "#638773" }}>{text || "-"}</span>,
-      width: "200px",
     },
     {
       title: "Categories",
-      dataIndex: "categories_en",
-      key: "categories_en",
+      dataIndex: "categories",
+      key: "categories",
+      fixed: "left",
+      width: "150px",
       render: (text) => (
         <span
           style={{
-            color: "#638773",
+            color: "#000",
             display: "flex",
             justifyContent: "center",
           }}
@@ -126,16 +132,104 @@ function SingleProduct() {
           {text || "-"}
         </span>
       ),
-      width: "200px",
     },
     {
       title: "Nova Class",
       dataIndex: "novaClass",
       key: "novaClass",
+      fixed: "left",
+      width: "140px",
+      render: (text) => {
+        let color;
+        const novaClass = Number(text);
+        
+        switch (novaClass) {
+          case 1:
+            color = "#638773"; 
+            break;
+          case 2:
+            color = "#466759"; 
+            break;
+          case 3:
+            color = "#e07b7b"; 
+            break;
+          case 4:
+            color = "#a14343"; 
+            break;
+          default:
+            color = "#000"; 
+        }
+        
+        return (
+          <span
+            style={{
+              color: color,
+              display: "flex",
+              justifyContent: "center",
+              fontWeight: "bold"
+            }}
+          >
+            {`Nova Class ${novaClass}` || "-"}
+          </span>
+        );
+      },
+    },
+    {
+      title: "Predicted Nova Class",
+      dataIndex: "predictedNoveClass",
+      key: "predictedNoveClass",
+      width: "300px",
+      render: (text) => {
+        let color, backgroundColor;
+        const novaClass = parseInt(text, 10);
+    
+        switch (novaClass) {
+          case 1:
+            color = "#638773";
+            backgroundColor = "#d1e0da"; 
+            break;
+          case 2:
+            color = "#466759"; 
+            backgroundColor = "#b3c4bb"; 
+            break;
+          case 3:
+            color = "#e07b7b"; 
+            backgroundColor = "#f6d1d1"; 
+            break;
+          case 4:
+            color = "#a14343"; 
+            backgroundColor = "#dba8a8"; 
+            break;
+          default:
+            color = "#000"; 
+            backgroundColor = "#fff"; 
+        }
+    
+        return (
+          <span
+            style={{
+              color: color,
+              backgroundColor: backgroundColor,
+              display: "flex",
+              justifyContent: "center",
+              padding: "5px 10px",
+              borderRadius: "5px",
+            }}
+          >
+            {`Predicted Nova Class ${novaClass}` || "-"}
+          </span>
+        );
+      },
+    },  
+    {
+      title: "Country",
+      dataIndex: "country",
+      key: "country",
+      width: "150px",
       render: (text) => (
         <span
           style={{
-            color: "#638773",
+            color: "#000",
             display: "flex",
             justifyContent: "center",
           }}
@@ -143,12 +237,12 @@ function SingleProduct() {
           {text || "-"}
         </span>
       ),
-      width: "200px",
-    },
+    },  
     {
       title: "Nutrition Score",
       dataIndex: "nutriscore_grade",
-      key: "totalFat",
+      key: "nutriscore_grade",
+      width: "200px",
       render: (text) => (
         <span
           style={{
@@ -160,12 +254,12 @@ function SingleProduct() {
           {text || "-"}
         </span>
       ),
-      width: "200px",
     },
     {
-      title: "Ecoscore Score",
-      dataIndex: "ecoscore_score",
-      key: "carbohydrate",
+      title: "Ecoscore Grade",
+      dataIndex: "ecoscore_grade",
+      key: "ecoscore_grade",
+      width: "200px",
       render: (text) => (
         <span
           style={{
@@ -177,12 +271,12 @@ function SingleProduct() {
           {text || "-"}
         </span>
       ),
-      width: "200px",
     },
     {
-      title: "Serving Size",
-      dataIndex: "serving_size",
-      key: "serving_size",
+      title: "Ingredients Analysis",
+      dataIndex: "ingredients_analysis",
+      key: "ingredients_analysis",
+      width: "200px",
       render: (text) => (
         <span
           style={{
@@ -194,7 +288,125 @@ function SingleProduct() {
           {text || "-"}
         </span>
       ),
+    },
+    {
+      title: "Additive",
+      dataIndex: "additives",
+      key: "additives",
       width: "200px",
+      render: (text) => (
+        <span
+          style={{
+            color: "#638773",
+            display: "flex",
+            justifyContent: "center",
+          }}
+        >
+          {text || "-"}
+        </span>
+      ),
+    },
+    {
+      title: "PNN Group 1",
+      dataIndex: "pnns_groups_1",
+      key: "pnns_groups_1",
+      width: "200px",
+      render: (text) => (
+        <span
+          style={{
+            color: "#638773",
+            display: "flex",
+            justifyContent: "center",
+          }}
+        >
+          {text || "-"}
+        </span>
+      ),
+    },
+    {
+      title: "PNN Group 2",
+      dataIndex: "pnns_groups_2",
+      key: "pnns_groups_2",
+      width: "200px",
+      render: (text) => (
+        <span
+          style={{
+            color: "#638773",
+            display: "flex",
+            justifyContent: "center",
+          }}
+        >
+          {text || "-"}
+        </span>
+      ),
+    },
+    {
+      title: "Food Group",
+      dataIndex: "food_groups",
+      key: "food_groups",
+      width: "200px",
+      render: (text) => (
+        <span
+          style={{
+            color: "#638773",
+            display: "flex",
+            justifyContent: "center",
+          }}
+        >
+          {text || "-"}
+        </span>
+      ),
+    },
+    {
+      title: "Nutrient Levels",
+      dataIndex: "nutrient_levels",
+      key: "nutrient_levels",
+      width: "200px",
+      render: (text) => (
+        <span
+          style={{
+            color: "#638773",
+            display: "flex",
+            justifyContent: "center",
+          }}
+        >
+          {text || "-"}
+        </span>
+      ),
+    },
+    {
+      title: "Completeness",
+      dataIndex: "completeness",
+      key: "completeness",
+      width: "200px",
+      render: (text) => (
+        <span
+          style={{
+            color: "#638773",
+            display: "flex",
+            justifyContent: "center",
+          }}
+        >
+          {text || "-"}
+        </span>
+      ),
+    },
+    {
+      title: "Nutrition Per 100g",
+      dataIndex: "nutrition_100g",
+      key: "nutrition_100g",
+      width: "200px",
+      render: (text) => (
+        <span
+          style={{
+            color: "#638773",
+            display: "flex",
+            justifyContent: "center",
+          }}
+        >
+          {text || "-"}
+        </span>
+      ),
     },
   ];
 

@@ -41,6 +41,7 @@ function Search() {
     novaClass3: false,
     novaClass4: false,
   });
+  const isStateAllFalse = Object.values(state).every((val) => val === false);
 
   const [categoryPage, setCategoryPage] = useState(0);
   const [brandPage, setBrandPage] = useState(0);
@@ -51,7 +52,7 @@ function Search() {
     
     axios.get(`http://localhost:8000/api/v1/search/unique-categories?page=${nextPage}`)
       .then((res) => {
-        setCategories(prevOptions => [...prevOptions, ...res.data.data.categories]);
+        setCategories(res.data.data.categories);
         setCategoryPage(nextPage);
       })
       .catch((err) => console.log(err));
@@ -62,7 +63,7 @@ function Search() {
     
     axios.get(`http://localhost:8000/api/v1/search/unique-brands?category=${categoryName}&page=${nextPage}`)
       .then((res) => {
-        setBrands(prevOptions => [...prevOptions, ...res.data.data.brands]);
+        setBrands(res.data.data.brands);
         setBrandPage(nextPage); 
       })
       .catch((err) => console.log(err));
@@ -73,7 +74,7 @@ function Search() {
     
     axios.get(`http://localhost:8000/api/v1/search/unique-product-names?category=${categoryName}&brand=${brandName}&page=${nextPage}`)
       .then((res) => {
-        setProducts(prevOptions => [...prevOptions, ...res.data.data.productNames]);
+        setProducts(res.data.data.productNames);
         setProductPage(nextPage); 
       })
       .catch((err) => console.log(err));
@@ -98,7 +99,6 @@ function Search() {
     axios.get(`http://localhost:8000/api/v1/search/getProductNameByCategory&Brand?categoryName=${selectedCategory}&brandName=${selectedBrand}`)
       .then((res) => {
         setProducts(res.data.data);
-        console.log("WTF", res.data.data)
       })
       .catch((err) => console.log(err));
   };
@@ -319,7 +319,7 @@ function Search() {
                               {...params}
                               label="Category Name"
                               variant="standard"
-                              InputProps={{
+                              slotProps={{
                                 ...params.InputProps,
                                 style: { color: "green" },
                               }}
@@ -338,7 +338,8 @@ function Search() {
                                 <Button
                                   onClick={getUniqueCategories}
                                   style={{
-                                    color: "blue",
+                                    color: "#638773",
+                                    backgroundColor: "#d1e0da",
                                     fontWeight: "bold",
                                     textTransform: "none",
                                     width: "100%",
@@ -384,7 +385,7 @@ function Search() {
                               {...params}
                               label="Brand Name"
                               variant="standard"
-                              InputProps={{
+                              slotProps={{
                                 ...params.InputProps,
                                 style: { color: "green" }, // Apply green text color
                               }}
@@ -404,7 +405,8 @@ function Search() {
                                 <Button
                                   onClick={getUniqueBrands}
                                   style={{
-                                    color: "blue",
+                                    color: "#638773",
+                                    backgroundColor: "#d1e0da",
                                     fontWeight: "bold",
                                     textTransform: "none",
                                     width: "100%",
@@ -450,7 +452,7 @@ function Search() {
                               {...params}
                               label="Product Name"
                               variant="standard"
-                              InputProps={{
+                              slotProps={{
                                 ...params.InputProps,
                                 style: { color: "green" }, // Apply green text color
                               }}
@@ -470,7 +472,8 @@ function Search() {
                                 <Button
                                   onClick={getUniqueProducts}
                                   style={{
-                                    color: "blue",
+                                    color: "#638773",
+                                    backgroundColor: "#d1e0da",
                                     fontWeight: "bold",
                                     textTransform: "none",
                                     width: "100%",
@@ -500,6 +503,8 @@ function Search() {
               navigateToResults();
             }}
             className="button"
+            disabled={value === 0 && isStateAllFalse} 
+            variant="contained"
           >
             Search
           </Button>
