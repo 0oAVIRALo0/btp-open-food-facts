@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 
-import {nutrientData, meanMedian, test12Data, test65Data, test102Data, test12Data as testData} from "../data";
+import {nutrientData, meanMedian, test7Data, test8Data, test44Data, test7Data as testData} from "../data";
 
 import { Container, Button, CircularProgress, Slider, InputAdornment, TextField} from "@mui/material";
 import { Modal, Select} from 'antd';
@@ -82,10 +82,10 @@ function Predict() {
 
   useEffect(() => {
     if (nutrientLevel == "7Nutrients") {
-      setDummyData(test12Data);
+      setDummyData(test7Data);
     } else if (nutrientLevel == "8Nutrients") {
-      setDummyData(test65Data);
-    } else setDummyData(test102Data);
+      setDummyData(test8Data);
+    } else setDummyData(test44Data);
   }, [nutrientLevel]);
 
   useEffect(() => {
@@ -100,7 +100,7 @@ function Predict() {
     let url = "http://localhost:8000/api/v1/predict/predict-class";
     if (nutrientLevel == "7Nutrients") nutrient = "7";
     else if (nutrientLevel == "8Nutrients") nutrient = "8";
-    else nutrient = "45";
+    else nutrient = "44";
 
     const data = {
       nutrientLevel: nutrient,
@@ -141,7 +141,7 @@ function Predict() {
                       options={[
                         {label:'7 Nutrients', value:"7Nutrients"},
                         {label:'8 Nutrients', value:"8Nutrients"},
-                        {label:'45 Nutrients', value:"45Nutrients"},
+                        {label:'44 Nutrients', value:"44Nutrients"},
                       ]}
                     getPopupContainer={trigger => trigger.parentElement}/> 
                     <Button
