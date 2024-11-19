@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
-import axios from 'axios'
+
+import {api, requests} from '../Utility'
 
 import { useNavigate } from "react-router-dom";
 
@@ -50,7 +51,7 @@ function Search() {
   const getUniqueCategories = () => {
     const nextPage = categoryPage + 1;
     
-    axios.get(`http://localhost:8000/api/v1/search/unique-categories?page=${nextPage}`)
+    api.get(`${requests.searchUnique.category}?page=${nextPage}`)
       .then((res) => {
         setCategories(res.data.data.categories);
         setCategoryPage(nextPage);
@@ -61,7 +62,7 @@ function Search() {
   const getUniqueBrands = () => {
     const nextPage = brandPage + 1;
     
-    axios.get(`http://localhost:8000/api/v1/search/unique-brands?category=${categoryName}&page=${nextPage}`)
+    api.get(`${requests.searchUnique.brands}?category=${categoryName}&page=${nextPage}`)
       .then((res) => {
         setBrands(res.data.data.brands);
         setBrandPage(nextPage); 
@@ -72,7 +73,7 @@ function Search() {
   const getUniqueProducts = () => {
     const nextPage = productPage + 1;
     
-    axios.get(`http://localhost:8000/api/v1/search/unique-product-names?category=${categoryName}&brand=${brandName}&page=${nextPage}`)
+    api.get(`${requests.searchUnique.productName}?category=${categoryName}&brand=${brandName}&page=${nextPage}`)
       .then((res) => {
         setProducts(res.data.data.productNames);
         setProductPage(nextPage); 
@@ -87,7 +88,7 @@ function Search() {
   }, []);
   
   const getBrands = (selectedCategory) => {
-    axios.get(`http://localhost:8000/api/v1/search/getBrandByCategory?categoryName=${selectedCategory}`)
+    api.get(`${requests.searchBy.category}?categoryName=${selectedCategory}`)
       .then((res) => {
         setBrands(res.data.data);
         setProducts([]); 
@@ -96,7 +97,7 @@ function Search() {
   };
   
   const getProducts = (selectedCategory, selectedBrand) => {
-    axios.get(`http://localhost:8000/api/v1/search/getProductNameByCategory&Brand?categoryName=${selectedCategory}&brandName=${selectedBrand}`)
+    api.get(`${requests.searchBy.categoryAndBrand}?categoryName=${selectedCategory}&brandName=${selectedBrand}`)
       .then((res) => {
         setProducts(res.data.data);
       })

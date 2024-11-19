@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+
+import {api, requests} from '../Utility';
 
 import {nutrientData, meanMedian, test7Data, test8Data, test44Data, test7Data as testData} from "../data";
 
@@ -97,7 +98,7 @@ function Predict() {
     setPredictModal(true);
     setLoading(true);
     let nutrient = "";
-    let url = "http://localhost:8000/api/v1/predict/predict-class";
+    // let url = "http://localhost:8000/api/v1/predict/predict-class";
     if (nutrientLevel == "7Nutrients") nutrient = "7";
     else if (nutrientLevel == "8Nutrients") nutrient = "8";
     else nutrient = "44";
@@ -107,8 +108,8 @@ function Predict() {
       modelInputData: Object.values(val).map(Number),
     };
 
-    axios
-      .post(url, { data })
+    api
+      .post(requests.predict, { data })
       .then((res) => {
         setLoading(false);
         console.log(res);

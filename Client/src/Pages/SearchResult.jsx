@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import {useSearchParams, useNavigate} from "react-router-dom";
-import axios from "axios";
+
+import {api, requests} from '../Utility';
 
 import { Table } from "antd";
 
@@ -18,7 +19,7 @@ function SearchResult() {
   const [loading, setLoading] = useState(false);
   const [tableParams, setTableParams] = useState({
     page: 1,
-    limit: 10,
+    limit: 8,
     total: 0,
   });
   
@@ -32,9 +33,9 @@ function SearchResult() {
       novaClass: novaclass || "",
     };
 
-    axios
+    api
       .post(
-        `http://localhost:8000/api/v1/search/search-result?type=${type}&pageNumber=${page}&entriesPerPage=${limit}`,
+        `${requests.searchResult}?type=${type}&pageNumber=${page}&entriesPerPage=${limit}`,
         requestBody,
         {
           headers: {
@@ -52,12 +53,13 @@ function SearchResult() {
             product_name: data?.product_name,
             novaClass: data?.nova_group,
             predictedNoveClass: data?.predicted,
-            categories: data?.main_category_en,
+            category: data?.main_category_en,
             brands: data?.brands,
-            country: data?.countries_en,
+            // country: data?.countries_en,
             // nutriscore_grade: data?.nutriscore_grade,
             // ecoscore_grade: data?.ecoscore_grade,
           };
+          // console.log("WTF", data?.url)
           tableData.push(obj);
         });
 
@@ -119,9 +121,9 @@ function SearchResult() {
       ),
     },
     {
-      title: "Categories",
-      dataIndex: "categories",
-      key: "categories",
+      title: "Category",
+      dataIndex: "category",
+      key: "category",
       fixed: "left",
       width: "150px",
       render: (text) => (
@@ -137,7 +139,7 @@ function SearchResult() {
       ),
     },
     {
-      title: "Nova Class",
+      title: "NOVA Class",
       dataIndex: "novaClass",
       key: "novaClass",
       fixed: "left",
@@ -172,13 +174,13 @@ function SearchResult() {
               fontWeight: "bold"
             }}
           >
-            {`Nova Class ${novaClass}` || "-"}
+            {`NOVA Class ${novaClass}` || "-"}
           </span>
         );
       },
     },
     {
-      title: "Predicted Nova Class",
+      title: "Predicted NOVA Class",
       dataIndex: "predictedNoveClass",
       key: "predictedNoveClass",
       fixed: "left",
@@ -220,29 +222,29 @@ function SearchResult() {
               borderRadius: "5px",
             }}
           >
-            {`Predicted Nova Class ${novaClass}` || "-"}
+            {`Predicted NOVA Class ${novaClass}` || "-"}
           </span>
         );
       },
     },  
-    {
-      title: "Country",
-      dataIndex: "country",
-      key: "country",
-      fixed: "left",
-      width: "150px",
-      render: (text) => (
-        <span
-          style={{
-            color: "#000",
-            display: "flex",
-            justifyContent: "center",
-          }}
-        >
-          {text || "-"}
-        </span>
-      ),
-    },  
+    // {
+    //   title: "Country",
+    //   dataIndex: "country",
+    //   key: "country",
+    //   fixed: "left",
+    //   width: "150px",
+    //   render: (text) => (
+    //     <span
+    //       style={{
+    //         color: "#000",
+    //         display: "flex",
+    //         justifyContent: "center",
+    //       }}
+    //     >
+    //       {text || "-"}
+    //     </span>
+    //   ),
+    // },  
     // {
     //   title: "Nutrition Score",
     //   dataIndex: "nutriscore_grade",
@@ -292,7 +294,7 @@ function SearchResult() {
           loading={loading}
           className="data-table"
           rowKey={(record) => record._id}
-          scroll={{ x: 1500, y: "calc(100vh - 200px)" }}
+          scroll={{ x: 0, y: "calc(100vh - 300px)" }}
           pagination={{
             showSizeChanger: true,
             pageSizeOptions: ["10", "20", "50", "100"],
