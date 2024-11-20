@@ -2,8 +2,15 @@ import React, { useState, useEffect } from "react";
 import {useSearchParams, useNavigate} from "react-router-dom";
 
 import {api, requests} from '../Utility';
+import {Filter} from '../Components';
 
-import { Table } from "antd";
+import { Table, Button} from "antd";
+
+const filterIcon = (
+  <svg width="20" height="12" viewBox="0 0 25 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M0 0H25V2.47059H0V0ZM4.16667 5.76471H20.8333V8.23529H4.16667V5.76471ZM9.16667 11.5294H15.8333V14H9.16667V11.5294Z" fill="#d5ebde"/>
+  </svg>
+)
 
 function SearchResult() {
   const [searchParams] = useSearchParams();
@@ -21,16 +28,24 @@ function SearchResult() {
     page: 1,
     limit: 8,
     total: 0,
+    searchParams: {
+      productName: '',
+      brandName: '',
+      category: '',
+      // novaClass: ''
+    },
   });
+  const [filterModal, setFilterModal] = useState(false)
+
   
   const apiCall = (page, limit) => {
     setLoading(true);
 
     const requestBody = {
-      categoryName: categoryName || "",
-      brandName: brandName || "",
-      productName: productName || "",
-      novaClass: novaclass || "",
+      categoryName: categoryName || tableParams.searchParams.category,
+      brandName: brandName || tableParams.searchParams.brandName,
+      productName: productName || tableParams.searchParams.productName,
+      novaClass: novaclass || tableParams.searchParams.novaClass,
     };
 
     api
@@ -55,11 +70,7 @@ function SearchResult() {
             predictedNoveClass: data?.predicted,
             category: data?.main_category_en,
             brands: data?.brands,
-            // country: data?.countries_en,
-            // nutriscore_grade: data?.nutriscore_grade,
-            // ecoscore_grade: data?.ecoscore_grade,
           };
-          // console.log("WTF", data?.url)
           tableData.push(obj);
         });
 
@@ -75,7 +86,7 @@ function SearchResult() {
 
   useEffect(() => {
     apiCall(tableParams.page, tableParams.limit);
-  }, [tableParams.page, tableParams.limit]);
+  }, [tableParams.page, tableParams.limit, tableParams.searchParams]);
   
   const columns = [
     {
@@ -288,6 +299,10 @@ function SearchResult() {
   return (
     <div className="searcResult-wrapper">
       <div className="container">
+      <div className='features-btn'>
+        <Button className='filter-btn' icon={<div className='filter-icon'>{filterIcon}</div>} onClick={()=>setFilterModal(true)}>Filter</Button>
+        {filterModal && <Filter open={filterModal} closeFunc={() => setFilterModal(false)} tableParams={tableParams} setTableParams={setTableParams}/>}
+      </div>
         <Table
           columns={columns}
           dataSource={data}
@@ -297,7 +312,7 @@ function SearchResult() {
           scroll={{ x: 0, y: "calc(100vh - 300px)" }}
           pagination={{
             showSizeChanger: true,
-            pageSizeOptions: ["10", "20", "50", "100"],
+            pageSizeOptions: ["8", "64", "50", "100"],
             current: tableParams.page,
             pageSize: tableParams.limit,
             total: tableParams.total,
