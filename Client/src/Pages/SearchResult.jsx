@@ -17,7 +17,9 @@ function SearchResult() {
   const navigate = useNavigate();
 
   const type = searchParams.get("type");
-  const novaclass = searchParams.get("novaclass")?.split(",").map(Number) || [];
+  const novaclass = searchParams.get("novaclass")
+    ? searchParams.get("novaclass").split(",").map(Number)
+    : []; 
   const categoryName = searchParams.get("categoryName");
   const brandName = searchParams.get("brandName");
   const productName = searchParams.get("productName");
@@ -47,7 +49,6 @@ function SearchResult() {
       productName: productName || tableParams.searchParams.productName,
       novaClass: novaclass || tableParams.searchParams.novaClass,
     };
-
     api
       .post(
         `${requests.searchResult}?type=${type}&pageNumber=${page}&entriesPerPage=${limit}`,

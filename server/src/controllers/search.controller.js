@@ -736,7 +736,7 @@ const searchResult = asyncHandler(async (req, res) => {
       brand: req.body.brandName || null,
       product: req.body.productName || null,
     };
-
+    console.log("Req Body", req.body)
     console.log("Filters:", filters);
 
     // Construct the Elasticsearch query dynamically
