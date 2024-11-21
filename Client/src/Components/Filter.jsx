@@ -6,7 +6,7 @@ function Filter({open,closeFunc, tableParams, setTableParams}) {
     productName: tableParams.searchParams.productName,
     brandName: tableParams.searchParams.brandName,
     category: tableParams.searchParams.category,
-    // novaClass: tableParams.searchParams.novaClass,
+    novaClass: tableParams.searchParams.novaClass,
   });
 
   const handleChange = (e) => {
@@ -27,12 +27,18 @@ function Filter({open,closeFunc, tableParams, setTableParams}) {
   };
 
   const handleReset = () => {
-    setFilterValues({
+    const resetValues = {
       productName: '',
       brandName: '',
       category: '',
       novaClass: '',
-    });
+    };
+    setFilterValues(resetValues); 
+    setTableParams((prev) => ({
+      ...prev,
+      searchParams: resetValues, 
+    }));
+    closeFunc();
   };
 
 return (
@@ -71,7 +77,7 @@ return (
             placeholder="Enter product name"
           />
         </div>
-        {/* <div className="filter-input">
+        <div className="filter-input">
           <label>NOVA Class</label>
           <Input
             name="novaClass"
@@ -79,13 +85,13 @@ return (
             onChange={handleChange}
             placeholder="Enter NOVA class"
           />
-        </div> */}
+        </div>
       </div>
       <div className="filter-actions">
-        <Button onClick={handleReset} className="reset-button">
+        <Button onClick={handleReset} className="btn">
           Reset
         </Button>
-        <Button type="primary" onClick={handleSubmit}>
+        <Button type="primary" onClick={handleSubmit} className="btn">
           Apply Filter
         </Button>
     </div>

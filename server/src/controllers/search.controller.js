@@ -268,129 +268,129 @@ const getUniqueProductNames = asyncHandler(async (req, res) => {
   });
 });
 
-const getAllData = async (pageNumber, entriesPerPage, from) => {
-  const countQuery = {
-    query: {
-      match_all: {},
-    },
-  };
+// const getAllData = async (pageNumber, entriesPerPage, from) => {
+//   const countQuery = {
+//     query: {
+//       match_all: {},
+//     },
+//   };
 
-  const countResult = await client.count({
-    index: ES_INDEX,
-    body: countQuery,
-  });
+//   const countResult = await client.count({
+//     index: ES_INDEX,
+//     body: countQuery,
+//   });
 
-  const maxLength = countResult.count;
-  console.log("Max Length:", maxLength);
+//   const maxLength = countResult.count;
+//   console.log("Max Length:", maxLength);
 
-  const searchQuery = {
-    query: {
-      match_all: {},
-    },
-    size: entriesPerPage,
-    from: from,
-  };
+//   const searchQuery = {
+//     query: {
+//       match_all: {},
+//     },
+//     size: entriesPerPage,
+//     from: from,
+//   };
 
-  const searchResult = await client.search({
-    index: ES_INDEX,
-    body: searchQuery,
-  });
+//   const searchResult = await client.search({
+//     index: ES_INDEX,
+//     body: searchQuery,
+//   });
 
-  console.log(
-    "Full Elasticsearch response for all data:",
-    JSON.stringify(searchResult, null, 2)
-  );
+//   console.log(
+//     "Full Elasticsearch response for all data:",
+//     JSON.stringify(searchResult, null, 2)
+//   );
 
-  return {
-    success: true,
-    documents: searchResult.hits.hits.map((hit) => hit._source),
-    maxLength: maxLength - from,
-  };
-};
+//   return {
+//     success: true,
+//     documents: searchResult.hits.hits.map((hit) => hit._source),
+//     maxLength: maxLength - from,
+//   };
+// };
 
-const getResultByCategoryBrandProduct = async (
-  pageNumber,
-  entriesPerPage,
-  category,
-  brand,
-  product,
-  from
-) => {
-  const mustClauses = [];
+// const getResultByCategoryBrandProduct = async (
+//   pageNumber,
+//   entriesPerPage,
+//   category,
+//   brand,
+//   product,
+//   from
+// ) => {
+//   const mustClauses = [];
 
-  if (category) {
-    mustClauses.push({ match: { main_category_en: category } });
-  }
+//   if (category) {
+//     mustClauses.push({ match: { main_category_en: category } });
+//   }
 
-  if (brand) {
-    mustClauses.push({ match: { brands: brand } });
-  }
+//   if (brand) {
+//     mustClauses.push({ match: { brands: brand } });
+//   }
 
-  if (product) {
-    mustClauses.push({ match: { product_name: product } });
-  }
+//   if (product) {
+//     mustClauses.push({ match: { product_name: product } });
+//   }
 
-  if (mustClauses.length === 0) {
-    return {
-      success: false,
-      message: "At least one of category, brand, or product must be provided.",
-    };
-  }
+//   if (mustClauses.length === 0) {
+//     return {
+//       success: false,
+//       message: "At least one of category, brand, or product must be provided.",
+//     };
+//   }
 
-  const countQuery = {
-    query: {
-      bool: {
-        must: mustClauses,
-      },
-    },
-  };
+//   const countQuery = {
+//     query: {
+//       bool: {
+//         must: mustClauses,
+//       },
+//     },
+//   };
 
-  const searchQuery = {
-    query: {
-      bool: {
-        must: mustClauses,
-      },
-    },
-    size: entriesPerPage,
-    from: from,
-  };
+//   const searchQuery = {
+//     query: {
+//       bool: {
+//         must: mustClauses,
+//       },
+//     },
+//     size: entriesPerPage,
+//     from: from,
+//   };
 
-  const countResult = await client.count({
-    index: ES_INDEX,
-    body: countQuery,
-  });
+//   const countResult = await client.count({
+//     index: ES_INDEX,
+//     body: countQuery,
+//   });
 
-  const maxLength = countResult.count;
-  console.log("Max Length:", maxLength);
+//   const maxLength = countResult.count;
+//   console.log("Max Length:", maxLength);
 
-  const searchResult = await client.search({
-    index: ES_INDEX,
-    body: searchQuery,
-  });
+//   const searchResult = await client.search({
+//     index: ES_INDEX,
+//     body: searchQuery,
+//   });
 
-  console.log(
-    "Full Elasticsearch response for category/brand/product:",
-    JSON.stringify(searchResult, null, 2)
-  );
+//   console.log(
+//     "Full Elasticsearch response for category/brand/product:",
+//     JSON.stringify(searchResult, null, 2)
+//   );
 
-  const documents = searchResult.hits.hits.map((hit) => hit._source);
+//   const documents = searchResult.hits.hits.map((hit) => hit._source);
 
-  if (documents.length === 0) {
-    return {
-      success: false,
-      message: "No documents found for the specified query.",
-    };
-  }
+//   if (documents.length === 0) {
+//     return {
+//       success: false,
+//       message: "No documents found for the specified query.",
+//     };
+//   }
 
-  return {
-    success: true,
-    documents,
-    maxLength: maxLength - from,
-    category,
-    brand,
-    product,
-  };
-};
+//   return {
+//     success: true,
+//     documents,
+//     maxLength: maxLength - from,
+//     category,
+//     brand,
+//     product,
+//   };
+// };
 
 const getDocumentById = asyncHandler(async (req, res) => {
   try {
@@ -527,103 +527,293 @@ const getProductNameByCategoryBrand = asyncHandler(async (req, res) => {
   });
 });
 
+// const searchResult = asyncHandler(async (req, res) => {
+//   try {
+//     const pageNumber = parseInt(req.query.pageNumber) || 1;
+//     console.log("Page Number:", pageNumber);
+//     const entriesPerPage = parseInt(req.query.entriesPerPage) || 10;
+//     console.log("Entries Per Page:", entriesPerPage);
+//     const from = (pageNumber - 1) * entriesPerPage;
+//     const type = req.query.type;
+//     console.log("Type:", type);
+//     let data = {};
+
+//     // Handling NOVA group query
+//     if (type === "novaclass") {
+//       const novaGroups = req.body.novaClass;
+//       // const novaGroups = novaGroup
+//       //   ? novaGroup.split(",").map((group) => group.trim())
+//       //   : [];
+
+//       console.log("Nova Groups:", novaGroups);
+
+//       data = await getResultByNovaGroup(
+//         pageNumber,
+//         entriesPerPage,
+//         novaGroups,
+//         from
+//       );
+
+//       if (!data.success) {
+//         return res.status(404).json({
+//           success: false,
+//           message: "No documents found for the specified NOVA group(s).",
+//         });
+//       }
+//     }
+
+//     // Handling category, brand, or product query
+//     if (type === "category") {
+//       console.log("Query", req.query);
+//       console.log("Body", req.body);
+//       const category = req.body.categoryName;
+//       console.log("Category:", category);
+//       const brand = req.body.brandName;
+//       console.log("Brand:", brand);
+//       const product = req.body.productName;
+//       console.log("Product:", product);
+
+//       if (!category && !brand && !product) {
+//         console.log("Fetching all data.");
+//         data = await getAllData(pageNumber, entriesPerPage, from);
+//         console.log("Max Length:", data.maxLength);
+
+//         if (!data.success) {
+//           return res.status(404).json({
+//             success: false,
+//             message: "No documents found.",
+//           });
+//         }
+//       } else {
+//         // Use the dynamic query function to handle partial or full inputs
+//         data = await getResultByCategoryBrandProduct(
+//           pageNumber,
+//           entriesPerPage,
+//           category,
+//           brand,
+//           product,
+//           from
+//         );
+
+//         if (!data.success) {
+//           return res.status(404).json({
+//             success: false,
+//             message: "No documents found for the specified query.",
+//           });
+//         }
+//       }
+//     }
+
+//     res.status(200).json({
+//       success: true,
+//       data: {
+//         documents: data.documents,
+//         totalLength: data.maxLength,
+//         category: data.category || null,
+//         brand: data.brand || null,
+//         product: data.product || null,
+//         novaGroups: data.novaGroups || null,
+//       },
+//     });
+//   } catch (error) {
+//     console.error("Elasticsearch query error:", error);
+//     res.status(500).json({
+//       success: false,
+//       message:
+//         "An error occurred while querying Elasticsearch for the specified type.",
+//     });
+//   }
+// });
+
+// const searchResult = asyncHandler(async (req, res) => {
+//   try {
+//     const pageNumber = parseInt(req.query.pageNumber) || 1;
+//     const entriesPerPage = parseInt(req.query.entriesPerPage) || 10;
+//     const from = (pageNumber - 1) * entriesPerPage;
+
+//     console.log("Page Number:", pageNumber);
+//     console.log("Entries Per Page:", entriesPerPage);
+
+//     const filters = {
+//       novaGroup: req.body.novaGroup || null,
+//       category: req.body.categoryName || null,
+//       brand: req.body.brandName || null,
+//       product: req.body.productName || null,
+//     };
+
+//     console.log("Req Body", req.body)
+//     console.log("Filters:", filters);
+
+//     // Construct the Elasticsearch query dynamically
+//     let mustClauses = [];
+//     if (filters.novaGroup) {
+//       mustClauses.push({
+//         terms: { nova_group: filters.novaGroup.split(',').map((s) => s.trim()) },
+//       });
+//     }
+//     if (filters.category) {
+//       mustClauses.push({
+//         match: { main_category_en: filters.category },
+//       });
+//     }
+//     if (filters.brand) {
+//       mustClauses.push({
+//         match: { brands: filters.brand },
+//       });
+//     }
+//     if (filters.product) {
+//       mustClauses.push({
+//         match: { product_name: filters.product },
+//       });
+//     }
+
+//     // Create Elasticsearch query body
+//     const query = {
+//       query: {
+//         bool: {
+//           must: mustClauses, // Must clauses for filtering
+//         },
+//       },
+//       size: entriesPerPage,
+//       from: from,
+//     };
+
+//     console.log("Elasticsearch Query Body:", JSON.stringify(query, null, 2));
+
+//     // Execute the main search query
+//     const searchResult = await client.search({
+//       index: ES_INDEX,
+//       body: query,
+//     });
+
+//     // Extract documents from the result
+//     const documents = searchResult.hits.hits.map((hit) => hit._source);
+
+//     // Count total matching documents for pagination
+//     const countQuery = {
+//       query: {
+//         bool: {
+//           must: mustClauses,
+//         },
+//       },
+//     };
+
+//     const countResult = await client.count({
+//       index: ES_INDEX,
+//       body: countQuery,
+//     });
+
+//     // Send response back
+//     res.status(200).json({
+//       success: true,
+//       data: {
+//         documents,
+//         totalLength: countResult.count,
+//       },
+//     });
+//   } catch (error) {
+//     console.error("Elasticsearch query error:", error);
+//     res.status(500).json({
+//       success: false,
+//       message: "An error occurred while querying Elasticsearch.",
+//     });
+//   }
+// });
+
 const searchResult = asyncHandler(async (req, res) => {
   try {
     const pageNumber = parseInt(req.query.pageNumber) || 1;
-    console.log("Page Number:", pageNumber);
     const entriesPerPage = parseInt(req.query.entriesPerPage) || 10;
-    console.log("Entries Per Page:", entriesPerPage);
     const from = (pageNumber - 1) * entriesPerPage;
-    const type = req.query.type;
-    console.log("Type:", type);
-    let data = {};
 
-    // Handling NOVA group query
-    if (type === "novaclass") {
-      const novaGroups = req.body.novaClass;
-      // const novaGroups = novaGroup
-      //   ? novaGroup.split(",").map((group) => group.trim())
-      //   : [];
+    console.log("Page Number:", pageNumber);
+    console.log("Entries Per Page:", entriesPerPage);
 
-      console.log("Nova Groups:", novaGroups);
+    // Capture filters from the request body
+    const filters = {
+      novaGroup: req.body.novaClass?.length ? req.body.novaClass : null,
+      category: req.body.categoryName || null,
+      brand: req.body.brandName || null,
+      product: req.body.productName || null,
+    };
 
-      data = await getResultByNovaGroup(
-        pageNumber,
-        entriesPerPage,
-        novaGroups,
-        from
-      );
+    console.log("Filters:", filters);
 
-      if (!data.success) {
-        return res.status(404).json({
-          success: false,
-          message: "No documents found for the specified NOVA group(s).",
-        });
-      }
+    // Construct the Elasticsearch query dynamically
+    let mustClauses = [];
+    if (filters.novaGroup) {
+      mustClauses.push({
+        terms: { nova_group: filters.novaGroup },
+      });
+    }
+    if (filters.category) {
+      mustClauses.push({
+        match: { main_category_en: filters.category },
+      });
+    }
+    if (filters.brand) {
+      mustClauses.push({
+        match: { brands: filters.brand },
+      });
+    }
+    if (filters.product) {
+      mustClauses.push({
+        match: { product_name: filters.product },
+      });
     }
 
-    // Handling category, brand, or product query
-    if (type === "category") {
-      console.log("Query", req.query);
-      console.log("Body", req.body);
-      const category = req.body.categoryName;
-      console.log("Category:", category);
-      const brand = req.body.brandName;
-      console.log("Brand:", brand);
-      const product = req.body.productName;
-      console.log("Product:", product);
+    const query = {
+      query: {
+        bool: {
+          must: mustClauses,
+        },
+      },
+      size: entriesPerPage,
+      from: from,
+    };
 
-      if (!category && !brand && !product) {
-        console.log("Fetching all data.");
-        data = await getAllData(pageNumber, entriesPerPage, from);
-        console.log("Max Length:", data.maxLength);
+    console.log("Elasticsearch Query Body:", JSON.stringify(query, null, 2));
 
-        if (!data.success) {
-          return res.status(404).json({
-            success: false,
-            message: "No documents found.",
-          });
-        }
-      } else {
-        // Use the dynamic query function to handle partial or full inputs
-        data = await getResultByCategoryBrandProduct(
-          pageNumber,
-          entriesPerPage,
-          category,
-          brand,
-          product,
-          from
-        );
+    // Execute the main search query
+    const searchResult = await client.search({
+      index: ES_INDEX,
+      body: query,
+    });
 
-        if (!data.success) {
-          return res.status(404).json({
-            success: false,
-            message: "No documents found for the specified query.",
-          });
-        }
-      }
-    }
+    // Extract documents from the result
+    const documents = searchResult.hits.hits.map((hit) => hit._source);
 
+    // Count total matching documents for pagination
+    const countQuery = {
+      query: {
+        bool: {
+          must: mustClauses,
+        },
+      },
+    };
+
+    const countResult = await client.count({
+      index: ES_INDEX,
+      body: countQuery,
+    });
+
+    // Send response back
     res.status(200).json({
       success: true,
       data: {
-        documents: data.documents,
-        totalLength: data.maxLength,
-        category: data.category || null,
-        brand: data.brand || null,
-        product: data.product || null,
-        novaGroups: data.novaGroups || null,
+        documents,
+        totalLength: countResult.count,
       },
     });
   } catch (error) {
     console.error("Elasticsearch query error:", error);
     res.status(500).json({
       success: false,
-      message:
-        "An error occurred while querying Elasticsearch for the specified type.",
+      message: "An error occurred while querying Elasticsearch.",
     });
   }
 });
+
 
 export {
   searchResult,

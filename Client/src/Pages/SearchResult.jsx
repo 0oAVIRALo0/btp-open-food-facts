@@ -32,7 +32,7 @@ function SearchResult() {
       productName: '',
       brandName: '',
       category: '',
-      // novaClass: ''
+      novaClass: ''
     },
   });
   const [filterModal, setFilterModal] = useState(false)
