@@ -19,6 +19,7 @@ data/
 logstash/
 .env
 es
+cert/
 
 ml/myenv/
 

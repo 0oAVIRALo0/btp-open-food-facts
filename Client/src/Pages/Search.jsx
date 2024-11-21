@@ -150,6 +150,72 @@ function Search() {
 
   const showMoreOption = "Show More";
 
+  const CustomListboxComponentForCategories = React.forwardRef(function CustomListboxComponent(props, ref) {
+    return (
+      <div {...props} ref={ref}>
+        {props.children}
+        <ListSubheader>
+          <Button
+            onClick={getUniqueCategories}
+            style={{
+              color: "#638773",
+              backgroundColor: "#d1e0da",
+              fontWeight: "bold",
+              textTransform: "none",
+              width: "100%",
+            }}
+          >
+            Show More
+          </Button>
+        </ListSubheader>
+      </div>
+    );
+  });
+
+  const CustomListboxComponentForBrands = React.forwardRef(function CustomListboxComponent(props, ref) {
+    return (
+      <div {...props} ref={ref}>
+        {props.children}
+        <ListSubheader>
+          <Button
+            onClick={getUniqueBrands}
+            style={{
+              color: "#638773",
+              backgroundColor: "#d1e0da",
+              fontWeight: "bold",
+              textTransform: "none",
+              width: "100%",
+            }}
+          >
+            Show More
+          </Button>
+        </ListSubheader>
+      </div>
+    );
+  });
+
+  const CustomListboxComponentForProducts = React.forwardRef(function CustomListboxComponent(props, ref) {
+    return (
+      <div {...props} ref={ref}>
+        {props.children}
+        <ListSubheader>
+          <Button
+            onClick={getUniqueProducts}
+            style={{
+              color: "#638773",
+              backgroundColor: "#d1e0da",
+              fontWeight: "bold",
+              textTransform: "none",
+              width: "100%",
+            }}
+          >
+            Show More
+          </Button>
+        </ListSubheader>
+      </div>
+    );
+  });
+
   return (
     <Container maxWidth="lg">
       <div className="search__wrapper">
@@ -325,26 +391,7 @@ function Search() {
                             </li>
                           )}
                           
-                          ListboxComponent={(props) => (
-                            <div {...props}>
-                              {props.children}
-                              <ListSubheader>
-                                <Button
-                                  onClick={getUniqueCategories}
-                                  style={{
-                                    color: "#638773",
-                                    backgroundColor: "#d1e0da",
-                                    fontWeight: "bold",
-                                    textTransform: "none",
-                                    width: "100%",
-                                  }}
-                                  key={showMoreOption}
-                                >
-                                  Show More
-                                </Button>
-                              </ListSubheader>
-                            </div>
-                          )}
+                          ListboxComponent={CustomListboxComponentForCategories}
                         />
                       </span>
                     </div>
@@ -391,27 +438,7 @@ function Search() {
                             </li>
                           )}
 
-                          // Add the "Show More" button below the dropdown list
-                          ListboxComponent={(props) => (
-                            <div {...props}>
-                              {props.children}
-                              <ListSubheader>
-                                <Button
-                                  onClick={getUniqueBrands}
-                                  style={{
-                                    color: "#638773",
-                                    backgroundColor: "#d1e0da",
-                                    fontWeight: "bold",
-                                    textTransform: "none",
-                                    width: "100%",
-                                  }}
-                                  key={showMoreOption}
-                                >
-                                  Show More
-                                </Button>
-                              </ListSubheader>
-                            </div>
-                          )}
+                          ListboxComponent={CustomListboxComponentForBrands}
                         />
                       </span>
                     </div>
@@ -458,27 +485,7 @@ function Search() {
                             </li>
                           )}
 
-                          // Add the "Show More" button below the dropdown list
-                          ListboxComponent={(props) => (
-                            <div {...props}>
-                              {props.children}
-                              <ListSubheader>
-                                <Button
-                                  onClick={getUniqueProducts}
-                                  style={{
-                                    color: "#638773",
-                                    backgroundColor: "#d1e0da",
-                                    fontWeight: "bold",
-                                    textTransform: "none",
-                                    width: "100%",
-                                  }}
-                                  key={showMoreOption}
-                                >
-                                  Show More
-                                </Button>
-                              </ListSubheader>
-                            </div>
-                          )}
+                          ListboxComponent={CustomListboxComponentForProducts}
                         />
                       </span>
                     </div>

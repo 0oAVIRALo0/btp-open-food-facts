@@ -1,8 +1,10 @@
-myenv/
 btp/
 7_Nutrients/
 8_Nutrients/
 44_Nutrients/
+check.ipynb
+main.py
+new_csv.ipynb
 
 # macOS system files
 .DS_Store

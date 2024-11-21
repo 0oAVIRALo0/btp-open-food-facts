@@ -108,6 +108,8 @@ function Predict() {
       modelInputData: Object.values(val).map(Number),
     };
 
+    console.log(data);
+
     api
       .post(requests.predict, { data })
       .then((res) => {

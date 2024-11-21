@@ -20,9 +20,7 @@ const client = new Client({
   },
   tls: {
     ca: fs.readFileSync(
-      "/Users/mahanshaditya/Downloads/DevTools/elasticsearch/config/certs/http_ca.crt"
-      // "/Users/mahanshaditya/Downloads/Elastic_security.crt"
-
+      "/Users/aviralchauhan/btp/open-food-facts/server/cert/Elastic Cloud Security.crt"
     ),
     rejectUnauthorized: false,
   },
