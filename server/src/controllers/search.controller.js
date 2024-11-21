@@ -21,6 +21,8 @@ const client = new Client({
   tls: {
     ca: fs.readFileSync(
       "/Users/mahanshaditya/Downloads/DevTools/elasticsearch/config/certs/http_ca.crt"
+      // "/Users/mahanshaditya/Downloads/Elastic_security.crt"
+
     ),
     rejectUnauthorized: false,
   },
@@ -726,9 +728,6 @@ const searchResult = asyncHandler(async (req, res) => {
     const entriesPerPage = parseInt(req.query.entriesPerPage) || 10;
     const from = (pageNumber - 1) * entriesPerPage;
 
-    console.log("Page Number:", pageNumber);
-    console.log("Entries Per Page:", entriesPerPage);
-
     // Capture filters from the request body
     const filters = {
       novaGroup: req.body.novaClass?.length ? req.body.novaClass : null,
@@ -736,8 +735,6 @@ const searchResult = asyncHandler(async (req, res) => {
       brand: req.body.brandName || null,
       product: req.body.productName || null,
     };
-    console.log("Req Body", req.body)
-    console.log("Filters:", filters);
 
     // Construct the Elasticsearch query dynamically
     let mustClauses = [];

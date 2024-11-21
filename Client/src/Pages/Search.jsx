@@ -142,16 +142,9 @@ function Search() {
       novaclass.push(4);
     }
 
-    const type =
-    value == 0
-      ? "novaclass"
-      : value == 1
-      ? "category"
-      : "";
-
     localStorage.setItem("activeNavBar", 2); 
     navigate(
-      `/search-result?type=${type}&novaclass=${novaclass}&categoryName=${categoryName}&brandName=${brandName}&productName=${productName}`
+      `/search-result?&novaclass=${novaclass}&categoryName=${categoryName}&brandName=${brandName}&productName=${productName}`
     );
   };
 

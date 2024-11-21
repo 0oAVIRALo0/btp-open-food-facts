@@ -16,13 +16,15 @@ function SearchResult() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
-  const type = searchParams.get("type");
-  const novaclass = searchParams.get("novaclass")
-    ? searchParams.get("novaclass").split(",").map(Number)
-    : []; 
-  const categoryName = searchParams.get("categoryName");
-  const brandName = searchParams.get("brandName");
-  const productName = searchParams.get("productName");
+  // const type = searchParams.get("type");
+  const initialSearchParams = {
+    productName: searchParams.get("productName") || "",
+    brandName: searchParams.get("brandName") || "",
+    category: searchParams.get("categoryName") || "",
+    novaClass: searchParams.get("novaclass")
+      ? searchParams.get("novaclass").split(",").map(Number)
+      : [],
+  };
 
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -30,28 +32,24 @@ function SearchResult() {
     page: 1,
     limit: 8,
     total: 0,
-    searchParams: {
-      productName: '',
-      brandName: '',
-      category: '',
-      novaClass: ''
-    },
+    searchParams: initialSearchParams,
   });
   const [filterModal, setFilterModal] = useState(false)
 
   
   const apiCall = (page, limit) => {
     setLoading(true);
-
+    console.log("WTF1", tableParams.searchParams);
     const requestBody = {
-      categoryName: categoryName || tableParams.searchParams.category,
-      brandName: brandName || tableParams.searchParams.brandName,
-      productName: productName || tableParams.searchParams.productName,
-      novaClass: novaclass || tableParams.searchParams.novaClass,
+      categoryName: tableParams.searchParams.category,
+      brandName: tableParams.searchParams.brandName,
+      productName: tableParams.searchParams.productName,
+      novaClass: tableParams.searchParams.novaClass,
     };
+    console.log("WTF2", requestBody)
     api
       .post(
-        `${requests.searchResult}?type=${type}&pageNumber=${page}&entriesPerPage=${limit}`,
+        `${requests.searchResult}?pageNumber=${page}&entriesPerPage=${limit}`,
         requestBody,
         {
           headers: {
@@ -88,6 +86,8 @@ function SearchResult() {
   useEffect(() => {
     apiCall(tableParams.page, tableParams.limit);
   }, [tableParams.page, tableParams.limit, tableParams.searchParams]);
+  
+  
   
   const columns = [
     {

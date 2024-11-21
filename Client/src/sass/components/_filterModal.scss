@@ -2,6 +2,7 @@
     .ant-modal-header{
         background-color: #638773;
         padding: 10px 25px;
+        margin: 0;
 
         .ant-modal-title{
             color: #d5ebde;
@@ -13,40 +14,79 @@
     .ant-modal-close{
         display: none;
     }
-
-
     .ant-modal-body{
-        padding: 15px;
-        .filter-form {
+        .filter-layout{
             display: flex;
-            flex-direction: column;
-            gap: 20px;
-        
-            .filter-input {
-                display: flex;
-                flex-direction: column;
-        
-                label {
+            .filter-sidebar {
+                width: 30%;
+                border-right: 1px solid #638773;
+                padding: 16px;
+                ul {
+                    list-style: none;
+                    padding: 0;
+                    margin: 0;
+            
+                    li {
+                    padding: 12px;
+                    cursor: pointer;
                     font-weight: bold;
-                    margin-bottom: 8px;
+                    border-radius: 4px;
+                    color: #587c68;
+                    transition: background-color 0.3s ease;
+            
+                    &.active {
+                        background-color: #ebe0d5;
+                        color: #587c68;
+                        border-bottom: 1px solid #587c68;
+                    }
+            
+                    &:hover {
+                        background-color: #ebe0d5;
+                    }
+                    }
+                }
+            }
+            .filter-content {
+                flex: 1;
+                padding: 16px;
+                label{
+                    font-weight: bold;
                     color: #638773;
                 }
-        
-                input {
+                input{
+                    margin-top: 6px;
                     padding: 10px;
                     font-size: 14px;
                     &:hover{
-                        border-color: #e69c52 !important;
+                    border-color: #e69c52 !important;
+                    }
+                    &.active{
+                    border-color: #e69c52 !important;
                     }
                 }
-
+                .nova-class-checkboxes {
+                    padding: 10px;
+                    display: flex;
+                    flex-direction: column; 
+                    gap: 12px; 
+            
+                    .nova-checkbox-item {
+                      display: flex;
+                      align-items: center;
+            
+                      .ant-checkbox-wrapper {
+                        font-size: 6px;
+                      }
+                    }
+                }
             }
+            border-bottom: 1px solid #638773;
         }
     }
     .filter-actions {
         display: flex;
-        justify-content: space-between;
-        margin-top: 20px;
+        justify-content: space-around;
+        padding: 8px 10px;
 
         .btn {
             &:hover {
@@ -66,3 +106,4 @@
         }
     }
   }
+  
