@@ -41,39 +41,6 @@ function Filter({open,closeFunc, tableParams, setTableParams}) {
     closeFunc();
   };
   
-  
-
-  // const handleCheckboxChange = (checkedValues) => {
-  //   setFilterValues((prev) => ({
-  //     ...prev,
-  //     novaClass: checkedValues,
-  //   }));
-  
-  //   // Immediately update `tableParams` with the new `novaClass` values
-  //   setTableParams((prev) => ({
-  //     ...prev,
-  //     searchParams: {
-  //       ...prev.searchParams,
-  //       novaClass: checkedValues,
-  //     },
-  //   }));
-  
-  //   console.log("WTF1", checkedValues);
-  // };
-  
-  // const handleSubmit = () => {
-  //   console.log("WTF2", tableParams.searchParams);
-  
-  //   // Update tableParams with all filter values on form submission
-  //   setTableParams((prev) => ({
-  //     ...prev,
-  //     searchParams: { ...filterValues },
-  //   }));
-  
-  //   closeFunc();
-  // };
-  
-
   const handleReset = () => {
     const resetValues = {
       productName: '',

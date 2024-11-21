@@ -39,14 +39,12 @@ function SearchResult() {
   
   const apiCall = (page, limit) => {
     setLoading(true);
-    console.log("WTF1", tableParams.searchParams);
     const requestBody = {
       categoryName: tableParams.searchParams.category,
       brandName: tableParams.searchParams.brandName,
       productName: tableParams.searchParams.productName,
       novaClass: tableParams.searchParams.novaClass,
     };
-    console.log("WTF2", requestBody)
     api
       .post(
         `${requests.searchResult}?pageNumber=${page}&entriesPerPage=${limit}`,

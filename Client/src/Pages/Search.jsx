@@ -320,7 +320,7 @@ function Search() {
                             />
                           )}
                           renderOption={(props, option) => (
-                            <li {...props} key={option.id}>
+                            <li {...props} key={option.id || option}>
                               {option}
                             </li>
                           )}
@@ -386,7 +386,7 @@ function Search() {
                             />
                           )}
                           renderOption={(props, option) => (
-                            <li {...props} key={option.id}>
+                            <li {...props} key={option.id || option}>
                               {option}
                             </li>
                           )}
@@ -453,7 +453,7 @@ function Search() {
                             />
                           )}
                           renderOption={(props, option) => (
-                            <li {...props} key={option.id}>
+                            <li {...props} key={option.id || option}>
                               {option}
                             </li>
                           )}
